@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>留言板 · 6A23xzh</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    .guestbook-wrap {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 120px 24px 80px;
+    }
+
+    .guestbook-wrap .section-title {
+      text-align: left;
+      margin-bottom: 8px;
+    }
+
+    .gb-desc {
+      color: var(--text-light);
+      margin-bottom: 36px;
+      font-size: 0.95rem;
+    }
+
+    /* 发消息表单 */
+    .gb-form {
+      background: white;
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 40px;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .gb-form h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .gb-form input,
+    .gb-form textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #f0f0f0;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.93rem;
+      color: var(--text);
+      background: var(--bg);
+      transition: border-color 0.2s;
+      outline: none;
+      resize: none;
+    }
+
+    .gb-form input:focus,
+    .gb-form textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .gb-form textarea { height: 90px; }
+
+    .form-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+      gap: 12px;
+    }
+
+    .owner-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-light);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .owner-toggle input[type="checkbox"] { display: none; }
+
+    .toggle-box {
+      width: 36px; height: 20px;
+      background: #e0e0e0;
+      border-radius: 999px;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .toggle-box::after {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      background: white;
+      border-radius: 50%;
+      top: 3px; left: 3px;
+      transition: transform 0.2s;
+    }
+
+    .owner-toggle input:checked + .toggle-box { background: var(--primary); }
+    .owner-toggle input:checked + .toggle-box::after { transform: translateX(16px); }
+
+    .gb-submit {
+      padding: 11px 28px;
+      background: linear-gradient(135deg, var(--primary), #ff8e53);
+      color: white;
+      border: none;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.93rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(255,107,107,0.35);
+    }
+
+    .gb-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255,107,107,0.45);
+    }
+
+    .gb-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* 密码输入（博主模式） */
+    .owner-pwd {
+      display: none;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .owner-pwd.show { display: block; }
+
+    /* 消息列表 */
+    .gb-messages { display: flex; flex-direction: column; gap: 16px; }
+
+    .gb-msg {
+      background: white;
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,0.04);
+      animation: fadeUp 0.4s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .gb-msg.owner-msg {
+      background: linear-gradient(135deg, #fff5f5, #fff9ec);
+      border-color: rgba(255,107,107,0.15);
+    }
+
+    .msg-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .msg-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e0e0e0, #f0f0f0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .owner-msg .msg-avatar {
+      background: linear-gradient(135deg, var(--primary), #ff8e53);
+    }
+
+    .msg-meta { flex: 1; }
+
+    .msg-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .owner-tag {
+      font-size: 0.7rem;
+      background: var(--primary);
+      color: white;
+      padding: 1px 7px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .msg-time {
+      font-size: 0.78rem;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+
+    .msg-content {
+      font-size: 0.93rem;
+      line-height: 1.75;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .gb-empty {
+      text-align: center;
+      color: var(--text-light);
+      padding: 48px 0;
+      font-size: 0.95rem;
+    }
+
+    .gb-loading {
+      text-align: center;
+      color: var(--text-light);
+      padding: 32px 0;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #2d2d2d;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: transform 0.3s ease;
+      z-index: 999;
+      white-space: nowrap;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">✦ 主页</a>
+    <ul class="nav-links">
+      <li><a href="index.html#about">关于</a></li>
+      <li><a href="index.html#contact">联系</a></li>
+      <li><a href="guestbook.html" style="color:var(--primary)">留言板</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle">☰</button>
+  </nav>
+
+  <div class="guestbook-wrap">
+    <h2 class="section-title">留言<span class="highlight">板</span></h2>
+    <p class="gb-desc">欢迎给我留言，我会认真阅读每一条消息 💬</p>
+
+    <!-- 发消息表单 -->
+    <div class="gb-form">
+      <h3>✍️ 写下你的留言</h3>
+      <div class="form-row">
+        <input type="text" id="nickname" placeholder="你的昵称" maxlength="20" />
+      </div>
+      <textarea id="content" placeholder="想说什么都可以..." maxlength="500"></textarea>
+      <input type="password" id="ownerPwd" class="owner-pwd" placeholder="输入博主密码" />
+      <div class="form-footer">
+        <label class="owner-toggle">
+          <input type="checkbox" id="isOwner" />
+          <span class="toggle-box"></span>
+          <span>我是博主</span>
+        </label>
+        <button class="gb-submit" id="submitBtn" onclick="submitMsg()">发送留言</button>
+      </div>
+    </div>
+
+    <!-- 消息列表 -->
+    <div id="msgList" class="gb-messages">
+      <div class="gb-loading">加载中...</div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://swzlrvmgrsrhhhnoagfl.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_RiZmi7keAoOwg8_j9N2J0g_iGfnlPb_';
+    const OWNER_PASSWORD = '6a23'; // 博主密码，可自行修改
+
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // 博主模式切换
+    document.getElementById('isOwner').addEventListener('change', function () {
+      document.getElementById('ownerPwd').classList.toggle('show', this.checked);
+      if (this.checked) {
+        document.getElementById('nickname').value = '6A23xzh';
+        document.getElementById('nickname').disabled = true;
+      } else {
+        document.getElementById('nickname').value = '';
+        document.getElementById('nickname').disabled = false;
+      }
+    });
+
+    // 导航栏
+    const navbar = document.querySelector('.navbar');
+    window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 20));
+    document.getElementById('navToggle').addEventListener('click', () => {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+
+    // Toast 提示
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // 格式化时间
+    function formatTime(ts) {
+      const d = new Date(ts);
+      const now = new Date();
+      const diff = (now - d) / 1000;
+      if (diff < 60) return '刚刚';
+      if (diff < 3600) return Math.floor(diff / 60) + ' 分钟前';
+      if (diff < 86400) return Math.floor(diff / 3600) + ' 小时前';
+      return d.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+    }
+
+    // 渲染消息
+    function renderMsg(msg) {
+      const div = document.createElement('div');
+      div.className = 'gb-msg' + (msg.is_owner ? ' owner-msg' : '');
+      const initial = msg.nickname.charAt(0).toUpperCase();
+      div.innerHTML = `
+        <div class="msg-header">
+          <div class="msg-avatar">${initial}</div>
+          <div class="msg-meta">
+            <div class="msg-name">
+              ${msg.nickname}
+              ${msg.is_owner ? '<span class="owner-tag">博主</span>' : ''}
+            </div>
+            <div class="msg-time">${formatTime(msg.created_at)}</div>
+          </div>
+        </div>
+        <div class="msg-content">${msg.content.replace(/</g, '&lt;')}</div>
+      `;
+      return div;
+    }
+
+    // 加载消息
+    async function loadMessages() {
+      const { data, error } = await db
+        .from('messages')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      const list = document.getElementById('msgList');
+      list.innerHTML = '';
+
+      if (error) {
+        list.innerHTML = '<div class="gb-empty">加载失败，请刷新重试 😢</div>';
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        list.innerHTML = '<div class="gb-empty">还没有留言，来第一个吧 🌟</div>';
+        return;
+      }
+
+      data.forEach(msg => list.appendChild(renderMsg(msg)));
+    }
+
+    // 提交留言
+    async function submitMsg() {
+      const nickname = document.getElementById('nickname').value.trim();
+      const content = document.getElementById('content').value.trim();
+      const isOwner = document.getElementById('isOwner').checked;
+      const pwd = document.getElementById('ownerPwd').value;
+
+      if (!nickname) { showToast('请输入昵称 👤'); return; }
+      if (!content) { showToast('请输入留言内容 ✏️'); return; }
+      if (isOwner && pwd !== OWNER_PASSWORD) { showToast('博主密码错误 🔒'); return; }
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = '发送中...';
+
+      const { error } = await db.from('messages').insert({
+        nickname,
+        content,
+        is_owner: isOwner
+      });
+
+      btn.disabled = false;
+      btn.textContent = '发送留言';
+
+      if (error) {
+        showToast('发送失败，请重试 😢');
+        return;
+      }
+
+      document.getElementById('content').value = '';
+      if (!isOwner) document.getElementById('nickname').value = '';
+      showToast('留言成功！🎉');
+      loadMessages();
+    }
+
+    // 支持 Ctrl+Enter 发送
+    document.getElementById('content').addEventListener('keydown', function (e) {
+      if (e.ctrlKey && e.key === 'Enter') submitMsg();
+    });
+
+    loadMessages();
+  </script>
+</body>
+</html>
