@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>天气预报 · 6A23xzh</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    .weather-wrap {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 120px 24px 80px;
+    }
+
+    .weather-wrap .section-title { text-align: left; margin-bottom: 8px; }
+    .weather-desc { color: var(--text-light); font-size: 0.95rem; margin-bottom: 32px; }
+
+    /* 搜索框 */
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 32px;
+      position: relative;
+    }
+
+    .search-box input {
+      flex: 1;
+      padding: 14px 20px;
+      border: 2px solid #f0f0f0;
+      border-radius: 999px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      background: white;
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 4px 20px rgba(255,107,107,0.15);
+    }
+
+    .search-btn {
+      padding: 14px 28px;
+      background: linear-gradient(135deg, var(--primary), #ff8e53);
+      color: white;
+      border: none;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(255,107,107,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .search-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,107,107,0.4); }
+
+    /* 搜索建议下拉 */
+    .suggestions {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 80px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      overflow: hidden;
+      z-index: 10;
+      display: none;
+    }
+
+    .suggestions.show { display: block; }
+
+    .suggestion-item {
+      padding: 12px 20px;
+      cursor: pointer;
+      font-size: 0.92rem;
+      transition: background 0.15s;
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    .suggestion-item:last-child { border-bottom: none; }
+    .suggestion-item:hover { background: #fff5f5; }
+    .suggestion-item .city-name { font-weight: 600; color: var(--text); }
+    .suggestion-item .city-sub { font-size: 0.8rem; color: var(--text-light); margin-top: 2px; }
+
+    /* 天气卡片 */
+    .weather-card {
+      background: white;
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+      display: none;
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .weather-card.show { display: block; animation: fadeUp 0.4s ease; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 当前天气 */
+    .current-weather {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .city-info h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 4px; }
+    .city-info p { color: var(--text-light); font-size: 0.88rem; }
+
+    .temp-display {
+      text-align: center;
+    }
+
+    .weather-icon { font-size: 4rem; line-height: 1; }
+    .temp-num {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1.1;
+    }
+
+    .weather-desc-text {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    /* 天气详情 */
+    .weather-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      padding-top: 20px;
+      border-top: 1px solid #f5f5f5;
+      margin-bottom: 28px;
+    }
+
+    .detail-item {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 14px 16px;
+      text-align: center;
+    }
+
+    .detail-icon { font-size: 1.4rem; margin-bottom: 6px; }
+    .detail-label { font-size: 0.75rem; color: var(--text-light); margin-bottom: 4px; }
+    .detail-value { font-size: 1rem; font-weight: 600; color: var(--text); }
+
+    /* 7天预报 */
+    .forecast-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+      color: var(--text);
+    }
+
+    .forecast-list {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .forecast-day {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 12px 6px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+
+    .forecast-day:hover { transform: translateY(-3px); }
+    .forecast-day.today { background: linear-gradient(135deg, #fff0f0, #fff8ec); border: 1.5px solid rgba(255,107,107,0.2); }
+
+    .day-name { font-size: 0.72rem; font-weight: 600; color: var(--text-light); margin-bottom: 6px; }
+    .day-icon { font-size: 1.4rem; margin-bottom: 6px; }
+    .day-high { font-size: 0.9rem; font-weight: 700; color: var(--text); }
+    .day-low { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; }
+
+    /* 加载/错误状态 */
+    .status-msg {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-light);
+      font-size: 0.95rem;
+      display: none;
+    }
+
+    .status-msg.show { display: block; }
+    .status-icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+    @media (max-width: 500px) {
+      .forecast-list { grid-template-columns: repeat(4, 1fr); }
+      .forecast-day:nth-child(n+5) { display: none; }
+      .current-weather { justify-content: center; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">✦ 主页</a>
+    <ul class="nav-links">
+      <li><a href="index.html#about">关于</a></li>
+      <li><a href="guestbook.html">留言板</a></li>
+      <li><a href="weather.html" style="color:var(--primary)">天气</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle">☰</button>
+  </nav>
+
+  <div class="weather-wrap">
+    <h2 class="section-title">天气<span class="highlight">预报</span></h2>
+    <p class="weather-desc">搜索任意城市，查看实时天气和未来 7 天预报 🌤️</p>
+
+    <div class="search-box">
+      <input type="text" id="cityInput" placeholder="输入城市名，如：北京、上海、Tokyo..." autocomplete="off" />
+      <button class="search-btn" onclick="searchCity()">搜索</button>
+      <div class="suggestions" id="suggestions"></div>
+    </div>
+
+    <div class="status-msg" id="statusMsg">
+      <div class="status-icon" id="statusIcon">🔍</div>
+      <div id="statusText">输入城市名开始搜索</div>
+    </div>
+
+    <div class="weather-card" id="weatherCard">
+      <div class="current-weather">
+        <div class="city-info">
+          <h2 id="cityName">—</h2>
+          <p id="citySubInfo">—</p>
+          <p id="updateTime" style="margin-top:4px"></p>
+        </div>
+        <div class="temp-display">
+          <div class="weather-icon" id="weatherIcon">—</div>
+          <div class="temp-num" id="tempNum">—</div>
+          <div class="weather-desc-text" id="weatherDescText">—</div>
+        </div>
+      </div>
+
+      <div class="weather-details">
+        <div class="detail-item">
+          <div class="detail-icon">💧</div>
+          <div class="detail-label">湿度</div>
+          <div class="detail-value" id="humidity">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-icon">💨</div>
+          <div class="detail-label">风速</div>
+          <div class="detail-value" id="windSpeed">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-icon">🌡️</div>
+          <div class="detail-label">体感温度</div>
+          <div class="detail-value" id="feelsLike">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-icon">☔</div>
+          <div class="detail-label">降水量</div>
+          <div class="detail-value" id="precipitation">—</div>
+        </div>
+      </div>
+
+      <div class="forecast-title">📅 未来 7 天预报</div>
+      <div class="forecast-list" id="forecastList"></div>
+    </div>
+  </div>
+
+  <script>
+    // 导航
+    const navbar = document.querySelector('.navbar');
+    window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 20));
+    document.getElementById('navToggle').addEventListener('click', () => {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+
+    // 天气代码 → emoji + 描述
+    function getWeatherInfo(code, isDay = 1) {
+      const map = {
+        0:  { icon: isDay ? '☀️' : '🌙', desc: '晴天' },
+        1:  { icon: '🌤️', desc: '大部晴朗' },
+        2:  { icon: '⛅', desc: '局部多云' },
+        3:  { icon: '☁️', desc: '阴天' },
+        45: { icon: '🌫️', desc: '雾' },
+        48: { icon: '🌫️', desc: '冻雾' },
+        51: { icon: '🌦️', desc: '轻毛毛雨' },
+        53: { icon: '🌦️', desc: '毛毛雨' },
+        55: { icon: '🌧️', desc: '大毛毛雨' },
+        61: { icon: '🌧️', desc: '小雨' },
+        63: { icon: '🌧️', desc: '中雨' },
+        65: { icon: '🌧️', desc: '大雨' },
+        71: { icon: '🌨️', desc: '小雪' },
+        73: { icon: '🌨️', desc: '中雪' },
+        75: { icon: '❄️', desc: '大雪' },
+        80: { icon: '🌦️', desc: '阵雨' },
+        81: { icon: '🌧️', desc: '中阵雨' },
+        82: { icon: '⛈️', desc: '强阵雨' },
+        95: { icon: '⛈️', desc: '雷阵雨' },
+        96: { icon: '⛈️', desc: '雷暴冰雹' },
+        99: { icon: '⛈️', desc: '强雷暴冰雹' },
+      };
+      return map[code] || { icon: '🌈', desc: '未知' };
+    }
+
+    const weekDays = ['周日','周一','周二','周三','周四','周五','周六'];
+
+    function setStatus(icon, text) {
+      document.getElementById('statusIcon').textContent = icon;
+      document.getElementById('statusText').textContent = text;
+      document.getElementById('statusMsg').classList.add('show');
+      document.getElementById('weatherCard').classList.remove('show');
+    }
+
+    function hideStatus() {
+      document.getElementById('statusMsg').classList.remove('show');
+    }
+
+    // 搜索建议（地理编码）
+    let suggestTimer = null;
+    document.getElementById('cityInput').addEventListener('input', function () {
+      clearTimeout(suggestTimer);
+      const q = this.value.trim();
+      if (q.length < 1) {
+        hideSuggestions();
+        return;
+      }
+      suggestTimer = setTimeout(() => fetchSuggestions(q), 350);
+    });
+
+    document.getElementById('cityInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') searchCity();
+    });
+
+    async function fetchSuggestions(q) {
+      try {
+        const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=zh&format=json`);
+        const data = await res.json();
+        showSuggestions(data.results || []);
+      } catch { hideSuggestions(); }
+    }
+
+    function showSuggestions(list) {
+      const box = document.getElementById('suggestions');
+      if (!list.length) { hideSuggestions(); return; }
+      box.innerHTML = list.map(item => `
+        <div class="suggestion-item" onclick="selectCity(${item.latitude}, ${item.longitude}, '${item.name}', '${item.country || ''}', '${item.admin1 || ''}')">
+          <div class="city-name">${item.name}</div>
+          <div class="city-sub">${[item.admin1, item.country].filter(Boolean).join(' · ')}</div>
+        </div>
+      `).join('');
+      box.classList.add('show');
+    }
+
+    function hideSuggestions() {
+      document.getElementById('suggestions').classList.remove('show');
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-box')) hideSuggestions();
+    });
+
+    function selectCity(lat, lon, name, country, admin1) {
+      hideSuggestions();
+      document.getElementById('cityInput').value = name;
+      fetchWeather(lat, lon, name, country, admin1);
+    }
+
+    async function searchCity() {
+      const q = document.getElementById('cityInput').value.trim();
+      if (!q) return;
+      hideSuggestions();
+      setStatus('🔍', '搜索中...');
+      try {
+        const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&language=zh&format=json`);
+        const data = await res.json();
+        if (!data.results || !data.results.length) {
+          setStatus('😢', '找不到该城市，换个名字试试？');
+          return;
+        }
+        const city = data.results[0];
+        fetchWeather(city.latitude, city.longitude, city.name, city.country || '', city.admin1 || '');
+      } catch {
+        setStatus('⚠️', '网络错误，请检查网络后重试');
+      }
+    }
+
+    async function fetchWeather(lat, lon, name, country, admin1) {
+      setStatus('⏳', '加载天气数据...');
+      try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+          `&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,is_day` +
+          `&daily=weather_code,temperature_2m_max,temperature_2m_min` +
+          `&timezone=auto&forecast_days=7`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+        renderWeather(data, name, country, admin1);
+      } catch {
+        setStatus('⚠️', '天气数据加载失败，请重试');
+      }
+    }
+
+    function renderWeather(data, name, country, admin1) {
+      const c = data.current;
+      const daily = data.daily;
+      const info = getWeatherInfo(c.weather_code, c.is_day);
+
+      // 当前天气
+      document.getElementById('cityName').textContent = name;
+      document.getElementById('citySubInfo').textContent = [admin1, country].filter(Boolean).join(' · ');
+      document.getElementById('updateTime').textContent = '更新时间：' + new Date(c.time).toLocaleString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('weatherIcon').textContent = info.icon;
+      document.getElementById('tempNum').textContent = Math.round(c.temperature_2m) + '°C';
+      document.getElementById('weatherDescText').textContent = info.desc;
+      document.getElementById('humidity').textContent = c.relative_humidity_2m + '%';
+      document.getElementById('windSpeed').textContent = c.wind_speed_10m + ' km/h';
+      document.getElementById('feelsLike').textContent = Math.round(c.apparent_temperature) + '°C';
+      document.getElementById('precipitation').textContent = c.precipitation + ' mm';
+
+      // 7天预报
+      const forecastList = document.getElementById('forecastList');
+      forecastList.innerHTML = '';
+      daily.time.forEach((dateStr, i) => {
+        const d = new Date(dateStr);
+        const dayInfo = getWeatherInfo(daily.weather_code[i]);
+        const isToday = i === 0;
+        const div = document.createElement('div');
+        div.className = 'forecast-day' + (isToday ? ' today' : '');
+        div.innerHTML = `
+          <div class="day-name">${isToday ? '今天' : weekDays[d.getDay()]}</div>
+          <div class="day-icon">${dayInfo.icon}</div>
+          <div class="day-high">${Math.round(daily.temperature_2m_max[i])}°</div>
+          <div class="day-low">${Math.round(daily.temperature_2m_min[i])}°</div>
+        `;
+        forecastList.appendChild(div);
+      });
+
+      hideStatus();
+      document.getElementById('weatherCard').classList.add('show');
+    }
+
+    // 默认加载北京天气
+    fetchWeather(39.9042, 116.4074, '北京', '中国', '北京市');
+  </script>
+</body>
+</html>
