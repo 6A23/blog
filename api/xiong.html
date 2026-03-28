@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>项家两兄弟 API</title>
+  <link rel="stylesheet" href="../style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    .api-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 120px 24px 80px;
+    }
+
+    .api-wrap .section-title { text-align: left; margin-bottom: 8px; }
+    .api-desc { color: var(--text-light); font-size: 0.95rem; margin-bottom: 36px; }
+
+    .input-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .input-box input {
+      flex: 1;
+      padding: 14px 20px;
+      border: 2px solid #f0f0f0;
+      border-radius: 999px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      background: white;
+      color: var(--text);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      transition: border-color 0.2s;
+    }
+
+    .input-box input:focus { border-color: var(--primary); }
+
+    .input-box button {
+      padding: 14px 28px;
+      background: linear-gradient(135deg, var(--primary), #ff8e53);
+      color: white;
+      border: none;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255,107,107,0.35);
+      transition: transform 0.2s;
+    }
+
+    .input-box button:hover { transform: translateY(-2px); }
+
+    /* 结果卡片 */
+    .result-card {
+      background: white;
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,0.05);
+      display: none;
+      animation: fadeUp 0.4s ease;
+    }
+
+    .result-card.show { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .result-avatar {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #ff8e53);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .result-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .result-tag {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 0.75rem;
+      background: var(--primary);
+      color: white;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .result-text {
+      font-size: 1rem;
+      line-height: 1.9;
+      color: var(--text);
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 20px 24px;
+      border-left: 4px solid var(--primary);
+      white-space: pre-wrap;
+    }
+
+    /* JSON 预览 */
+    .json-box {
+      margin-top: 20px;
+    }
+
+    .json-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-light);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .json-code {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+
+    .json-key { color: #89b4fa; }
+    .json-str { color: #a6e3a1; }
+    .json-num { color: #fab387; }
+
+    /* 未找到 */
+    .not-found {
+      text-align: center;
+      padding: 32px;
+      color: var(--text-light);
+      font-size: 0.95rem;
+      display: none;
+    }
+
+    .not-found.show { display: block; }
+    .not-found-icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+    /* 快捷按钮 */
+    .quick-btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .quick-btn {
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: 2px solid rgba(0,0,0,0.08);
+      background: white;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text);
+    }
+
+    .quick-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="../index.html" class="nav-logo">✦ 主页</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">关于</a></li>
+      <li><a href="../guestbook.html">留言板</a></li>
+      <li><a href="../weather.html">天气</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle">☰</button>
+  </nav>
+
+  <div class="api-wrap">
+    <h2 class="section-title">项家<span class="highlight">两兄弟</span></h2>
+    <p class="api-desc">输入姓名，获取专属介绍 🐉</p>
+
+    <div class="quick-btns">
+      <button class="quick-btn" onclick="query('项羽')">项羽</button>
+      <button class="quick-btn" onclick="query('项庄')">项庄</button>
+      <button class="quick-btn" onclick="query('项伯')">项伯</button>
+      <button class="quick-btn" onclick="query('项梁')">项梁</button>
+    </div>
+
+    <div class="input-box">
+      <input type="text" id="nameInput" placeholder="输入姓名，如：项羽" maxlength="20" />
+      <button onclick="query()">查询</button>
+    </div>
+
+    <div class="not-found" id="notFound">
+      <div class="not-found-icon">🤔</div>
+      <div>此人不在项家族谱中，换个名字试试？</div>
+    </div>
+
+    <div class="result-card" id="resultCard">
+      <div class="result-header">
+        <div class="result-avatar" id="resAvatar">⚔️</div>
+        <div>
+          <div class="result-name" id="resName">—</div>
+          <span class="result-tag" id="resTag">—</span>
+        </div>
+      </div>
+      <div class="result-text" id="resText">—</div>
+      <div class="json-box">
+        <div class="json-title">JSON 响应</div>
+        <pre class="json-code" id="jsonOutput"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 导航
+    const navbar = document.querySelector('.navbar');
+    window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 20));
+    document.getElementById('navToggle').addEventListener('click', () => {
+      document.querySelector('.nav-links').classList.toggle('open');
+    });
+
+    // 数据库
+    const database = {
+      '项羽': {
+        avatar: '⚔️',
+        tag: '西楚霸王',
+        text: `项羽（公元前232年—公元前202年），名籍，字羽，楚国下相人，西楚霸王。
+
+他力拔山兮气盖世，巨鹿之战以少胜多，大破秦军，威震天下。鸿门宴上放走刘邦，留下千古遗憾。
+
+最终被围垓下，四面楚歌，乌江自刎，英雄末路，令人扼腕。
+
+"生当作人杰，死亦为鬼雄。" —— 李清照`,
+      },
+      '项庄': {
+        avatar: '🗡️',
+        tag: '项羽堂弟',
+        text: `项庄，项羽的堂弟，楚军将领。
+
+鸿门宴上，项庄奉范增之命，以"舞剑助兴"为由，意图刺杀刘邦。
+
+然而项伯挺身而出，也拔剑起舞，以身护住刘邦，使项庄无从下手。
+
+"项庄舞剑，意在沛公" —— 此典故流传千古。`,
+      },
+      '项伯': {
+        avatar: '🛡️',
+        tag: '项羽叔父',
+        text: `项伯，项羽的叔父，为人重情义。
+
+鸿门宴前夜，他连夜奔赴刘邦营地，私告张良，救了刘邦一命。宴上又以身护住刘邦，阻止项庄行刺。
+
+后来汉朝建立，刘邦感念其恩，赐其刘姓，封射阳侯。
+
+项伯的"仁义"，某种程度上改变了历史走向。`,
+      },
+      '项梁': {
+        avatar: '👑',
+        tag: '项羽叔父·起义首领',
+        text: `项梁，项羽的叔父，楚国名将项燕之子。
+
+秦末天下大乱，项梁与项羽起兵江东，拥立楚怀王，成为反秦义军的重要领袖。
+
+他慧眼识人，一手培养和带领项羽成长为顶天立地的英雄。
+
+可惜定陶一战轻敌冒进，被秦将章邯击败，壮志未酬身先死。`,
+      },
+    };
+
+    document.getElementById('nameInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') query();
+    });
+
+    function query(name) {
+      const input = name || document.getElementById('nameInput').value.trim();
+      if (!input) return;
+      document.getElementById('nameInput').value = input;
+
+      const card = document.getElementById('resultCard');
+      const notFound = document.getElementById('notFound');
+      card.classList.remove('show');
+      notFound.classList.remove('show');
+
+      const data = database[input];
+
+      if (!data) {
+        notFound.classList.add('show');
+        return;
+      }
+
+      document.getElementById('resAvatar').textContent = data.avatar;
+      document.getElementById('resName').textContent = input;
+      document.getElementById('resTag').textContent = data.tag;
+      document.getElementById('resText').textContent = data.text;
+
+      // JSON 响应展示
+      const json = {
+        code: 200,
+        name: input,
+        tag: data.tag,
+        description: data.text.replace(/\n/g, ' ').trim(),
+      };
+
+      document.getElementById('jsonOutput').innerHTML =
+        `<span class="json-str">{</span>\n` +
+        `  <span class="json-key">"code"</span>: <span class="json-num">${json.code}</span>,\n` +
+        `  <span class="json-key">"name"</span>: <span class="json-str">"${json.name}"</span>,\n` +
+        `  <span class="json-key">"tag"</span>: <span class="json-str">"${json.tag}"</span>,\n` +
+        `  <span class="json-key">"description"</span>: <span class="json-str">"${json.description.substring(0, 60)}..."</span>\n` +
+        `<span class="json-str">}</span>`;
+
+      card.classList.add('show');
+    }
+  </script>
+</body>
+</html>
