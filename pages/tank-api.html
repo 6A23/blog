@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>小坦克 API 演示</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #1a1a2e;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 16px 40px;
+    }
+
+    .navbar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 40px;
+      background: rgba(26,26,46,0.9);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .nav-logo { font-size: 1.2rem; font-weight: 700; color: #ff6b6b; text-decoration: none; }
+    .nav-back { padding: 8px 20px; border-radius: 999px; background: rgba(255,107,107,0.2); border: 1px solid rgba(255,107,107,0.4); color: #ff6b6b; text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: all 0.2s; }
+    .nav-back:hover { background: #ff6b6b; color: white; }
+
+    h1 { font-size: 2rem; font-weight: 700; margin: 36px 0 6px; }
+    h1 span { color: #6bcb77; }
+    .subtitle { color: rgba(255,255,255,0.45); font-size: 0.95rem; margin-bottom: 32px; }
+
+    .main-area {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    /* 地图 */
+    .map-wrap { position: relative; }
+
+    canvas {
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.1);
+      box-shadow: 0 0 40px rgba(107,203,119,0.2);
+      display: block;
+    }
+
+    /* 右侧面板 */
+    .panel {
+      flex: 1;
+      min-width: 260px;
+      max-width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+
+    .card-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 12px;
+    }
+
+    .pos-display {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .pos-val {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #6bcb77;
+      line-height: 1;
+    }
+
+    .pos-label {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.4);
+      margin-top: 4px;
+    }
+
+    .dir-badge {
+      margin-left: auto;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(107,203,119,0.2);
+      border: 1px solid rgba(107,203,119,0.4);
+      color: #6bcb77;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    /* API URL */
+    .url-box {
+      font-family: monospace;
+      font-size: 0.78rem;
+      color: #ffd93d;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      padding: 10px 12px;
+      word-break: break-all;
+      line-height: 1.6;
+    }
+
+    /* JSON 响应 */
+    .json-box {
+      font-family: monospace;
+      font-size: 0.78rem;
+      color: #a8e6a3;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      padding: 10px 12px;
+      line-height: 1.8;
+      white-space: pre;
+      overflow-x: auto;
+      max-height: 220px;
+    }
+
+    /* 方向键 */
+    .dpad {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .dpad-row { display: flex; gap: 6px; }
+    .dpad-btn {
+      width: 52px; height: 52px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, transform 0.1s;
+      user-select: none;
+    }
+    .dpad-btn:hover { background: rgba(107,203,119,0.3); }
+    .dpad-btn:active, .dpad-btn.active { background: rgba(107,203,119,0.5); transform: scale(0.92); }
+
+    /* 文档区 */
+    .docs {
+      width: 100%;
+      max-width: 900px;
+      margin-top: 32px;
+    }
+
+    .docs h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .endpoint-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .endpoint {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+
+    .ep-line {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .method {
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(77,150,255,0.25);
+      color: #4d96ff;
+      border: 1px solid rgba(77,150,255,0.3);
+    }
+
+    .ep-url {
+      font-family: monospace;
+      font-size: 0.88rem;
+      color: #ffd93d;
+    }
+
+    .ep-desc {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 600px) {
+      canvas { width: 288px; height: 288px; }
+      .navbar { padding: 14px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="../index.html" class="nav-logo">✦ 主页</a>
+    <a href="../index.html" class="nav-back">← 返回</a>
+  </nav>
+
+  <h1>🎮 小<span>坦克</span> API</h1>
+  <p class="subtitle">用键盘或点击方向键，通过 API 控制坦克移动</p>
+
+  <div class="main-area">
+
+    <!-- 地图 -->
+    <div class="map-wrap">
+      <canvas id="map" width="360" height="360"></canvas>
+    </div>
+
+    <!-- 面板 -->
+    <div class="panel">
+
+      <!-- 当前位置 -->
+      <div class="card">
+        <div class="card-title">当前位置</div>
+        <div class="pos-display">
+          <div>
+            <div class="pos-val" id="px">5</div>
+            <div class="pos-label">X（列）</div>
+          </div>
+          <div>
+            <div class="pos-val" id="py">5</div>
+            <div class="pos-label">Y（行）</div>
+          </div>
+          <div class="dir-badge" id="dirBadge">—</div>
+        </div>
+      </div>
+
+      <!-- 方向键 -->
+      <div class="card">
+        <div class="card-title">方向控制（键盘 / 点击）</div>
+        <div class="dpad">
+          <div class="dpad-row"><button class="dpad-btn" id="dUp" data-dir="up">▲</button></div>
+          <div class="dpad-row">
+            <button class="dpad-btn" id="dLeft" data-dir="left">◀</button>
+            <button class="dpad-btn" id="dDown" data-dir="down">▼</button>
+            <button class="dpad-btn" id="dRight" data-dir="right">▶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- API 请求 URL -->
+      <div class="card">
+        <div class="card-title">API 请求 URL</div>
+        <div class="url-box" id="urlBox">点击方向键发起请求…</div>
+      </div>
+
+      <!-- JSON 响应 -->
+      <div class="card">
+        <div class="card-title">API 返回 JSON</div>
+        <div class="json-box" id="jsonBox">等待请求…</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 接口文档 -->
+  <div class="docs">
+    <h2>📄 接口文档</h2>
+    <div class="endpoint-list">
+      <div class="endpoint">
+        <div class="ep-line">
+          <span class="method">GET</span>
+          <span class="ep-url">/api/tank</span>
+        </div>
+        <div class="ep-desc">获取初始位置（地图中央），不移动。</div>
+      </div>
+      <div class="endpoint">
+        <div class="ep-line">
+          <span class="method">GET</span>
+          <span class="ep-url">/api/tank?x=5&amp;y=5&amp;move=up</span>
+        </div>
+        <div class="ep-desc">
+          传入当前坐标 <code style="color:#ffd93d">x</code>、<code style="color:#ffd93d">y</code> 和移动方向 <code style="color:#ffd93d">move</code>（up / down / left / right），返回移动后的新坐标。<br>
+          碰到边界时 <code style="color:#ff8e53">blocked: true</code>，坐标不变。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('map');
+    const ctx = canvas.getContext('2d');
+    const SIZE = 12;
+    const CELL = canvas.width / SIZE;
+
+    let tankX = 5, tankY = 5, tankDir = null;
+
+    function drawMap() {
+      // 背景
+      ctx.fillStyle = '#16213e';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 网格
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= SIZE; i++) {
+        ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, canvas.height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(canvas.width, i * CELL); ctx.stroke();
+      }
+
+      // 坦克
+      drawTank(tankX, tankY, tankDir);
+    }
+
+    function drawTank(c, r, dir) {
+      const x = c * CELL, y = r * CELL, s = CELL, pad = 3;
+      // 履带
+      ctx.fillStyle = '#4aaa5a';
+      ctx.fillRect(x + 2, y + pad, 5, s - pad * 2);
+      ctx.fillRect(x + s - 7, y + pad, 5, s - pad * 2);
+      // 车身
+      ctx.fillStyle = '#6bcb77';
+      ctx.fillRect(x + 7, y + 5, s - 14, s - 10);
+      // 炮塔
+      ctx.fillStyle = '#4aaa5a';
+      const cx = x + s / 2, cy = y + s / 2;
+      ctx.beginPath(); ctx.arc(cx, cy, 7, 0, Math.PI * 2); ctx.fill();
+      // 炮管
+      if (dir) {
+        const dm = { up:[0,-1], down:[0,1], left:[-1,0], right:[1,0] };
+        const [dx, dy] = dm[dir];
+        ctx.strokeStyle = '#4aaa5a';
+        ctx.lineWidth = 3; ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + dx * 13, cy + dy * 13);
+        ctx.stroke();
+      }
+    }
+
+    async function move(dir) {
+      // 高亮按钮
+      document.querySelectorAll('.dpad-btn').forEach(b => b.classList.remove('active'));
+      const btn = document.querySelector(`[data-dir="${dir}"]`);
+      if (btn) { btn.classList.add('active'); setTimeout(() => btn.classList.remove('active'), 200); }
+
+      const url = `/api/tank?x=${tankX}&y=${tankY}&move=${dir}`;
+      document.getElementById('urlBox').textContent = url;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        document.getElementById('jsonBox').textContent = JSON.stringify(data, null, 2);
+        document.getElementById('px').textContent = data.x;
+        document.getElementById('py').textContent = data.y;
+
+        const dirEmoji = { up:'↑', down:'↓', left:'←', right:'→' };
+        document.getElementById('dirBadge').textContent =
+          (data.blocked ? '🚫 ' : '') + (dirEmoji[dir] || dir);
+
+        tankX = data.x;
+        tankY = data.y;
+        tankDir = data.dir;
+        drawMap();
+      } catch(e) {
+        document.getElementById('jsonBox').textContent = '请求失败：' + e.message;
+      }
+    }
+
+    // 方向键按钮
+    document.querySelectorAll('.dpad-btn').forEach(btn => {
+      btn.addEventListener('click', () => move(btn.dataset.dir));
+      btn.addEventListener('touchstart', e => { e.preventDefault(); move(btn.dataset.dir); }, { passive: false });
+    });
+
+    // 键盘
+    const keyMap = {
+      ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
+      w: 'up', s: 'down', a: 'left', d: 'right',
+      W: 'up', S: 'down', A: 'left', D: 'right',
+    };
+    window.addEventListener('keydown', e => {
+      if (keyMap[e.key]) { e.preventDefault(); move(keyMap[e.key]); }
+    });
+
+    drawMap();
+  </script>
+</body>
+</html>
