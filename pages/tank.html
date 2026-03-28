@@ -328,7 +328,7 @@
     let bullets = [], enemyBullets = [], enemies = [], walls = [];
     let player, base;
     let keys = {};
-    let lastShot = 0, lastEnemyShot = 0;
+    let lastShot = 0, lastEnemyShot = 0, lastMove = 0;
     let animId;
 
     // ===== 颜色主题 =====
@@ -403,6 +403,7 @@
 
     function startLevel() {
       bullets = []; enemyBullets = [];
+      lastMove = 0; lastShot = 0; lastEnemyShot = 0;
       buildMap();
 
       // 玩家：底部中间
@@ -543,23 +544,26 @@
     function update(dt, ts) {
       if (gameOver || gameWin) return;
 
-      // 玩家移动
-      const speed = 1;
-      let nc = player.c, nr = player.r;
-      if ((keys['ArrowUp'] || keys['w'] || keys['W']) && player.dir === 'up') { nr--; player.dir = 'up'; }
-      else if ((keys['ArrowDown'] || keys['s'] || keys['S']) && player.dir === 'down') { nr++; player.dir = 'down'; }
-      else if ((keys['ArrowLeft'] || keys['a'] || keys['A']) && player.dir === 'left') { nc--; player.dir = 'left'; }
-      else if ((keys['ArrowRight'] || keys['d'] || keys['D']) && player.dir === 'right') { nc++; player.dir = 'right'; }
-      else if (keys['ArrowUp'] || keys['w'] || keys['W']) player.dir = 'up';
-      else if (keys['ArrowDown'] || keys['s'] || keys['S']) player.dir = 'down';
-      else if (keys['ArrowLeft'] || keys['a'] || keys['A']) player.dir = 'left';
-      else if (keys['ArrowRight'] || keys['d'] || keys['D']) player.dir = 'right';
+      // 玩家移动（每 150ms 移动一格，避免速度过快）
+      if (ts - lastMove > 150) {
+        let nc = player.c, nr = player.r;
+        if ((keys['ArrowUp'] || keys['w'] || keys['W']) && player.dir === 'up') { nr--; }
+        else if ((keys['ArrowDown'] || keys['s'] || keys['S']) && player.dir === 'down') { nr++; }
+        else if ((keys['ArrowLeft'] || keys['a'] || keys['A']) && player.dir === 'left') { nc--; }
+        else if ((keys['ArrowRight'] || keys['d'] || keys['D']) && player.dir === 'right') { nc++; }
+        else if (keys['ArrowUp'] || keys['w'] || keys['W']) { player.dir = 'up'; lastMove = ts; }
+        else if (keys['ArrowDown'] || keys['s'] || keys['S']) { player.dir = 'down'; lastMove = ts; }
+        else if (keys['ArrowLeft'] || keys['a'] || keys['A']) { player.dir = 'left'; lastMove = ts; }
+        else if (keys['ArrowRight'] || keys['d'] || keys['D']) { player.dir = 'right'; lastMove = ts; }
 
-      // 边界 + 墙壁碰撞
-      if (nc >= 0 && nc < COLS && nr >= 0 && nr < ROWS && !isWall(nc, nr) && !(nc === base.c && nr === base.r)) {
-        // 不与敌人重叠
-        if (!enemies.some(e => e.c === nc && e.r === nr)) {
-          player.c = nc; player.r = nr;
+        // 边界 + 墙壁碰撞
+        if ((nc !== player.c || nr !== player.r) &&
+            nc >= 0 && nc < COLS && nr >= 0 && nr < ROWS &&
+            !isWall(nc, nr) && !(nc === base.c && nr === base.r)) {
+          if (!enemies.some(e => e.c === nc && e.r === nr)) {
+            player.c = nc; player.r = nr;
+            lastMove = ts;
+          }
         }
       }
 
