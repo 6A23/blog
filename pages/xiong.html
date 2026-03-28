@@ -53,7 +53,6 @@
 
     .input-box button:hover { transform: translateY(-2px); }
 
-    /* 结果卡片 */
     .result-card {
       background: white;
       border-radius: 20px;
@@ -89,10 +88,7 @@
       flex-shrink: 0;
     }
 
-    .result-name {
-      font-size: 1.4rem;
-      font-weight: 700;
-    }
+    .result-name { font-size: 1.4rem; font-weight: 700; }
 
     .result-tag {
       display: inline-block;
@@ -116,10 +112,7 @@
       white-space: pre-wrap;
     }
 
-    /* JSON 预览 */
-    .json-box {
-      margin-top: 20px;
-    }
+    .json-box { margin-top: 20px; }
 
     .json-title {
       font-size: 0.8rem;
@@ -145,7 +138,22 @@
     .json-str { color: #a6e3a1; }
     .json-num { color: #fab387; }
 
-    /* 未找到 */
+    /* API 使用说明 */
+    .api-docs {
+      background: #1e1e2e;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 28px;
+      color: #cdd6f4;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      line-height: 1.8;
+    }
+
+    .api-docs .comment { color: #6c7086; }
+    .api-docs .url { color: #89dceb; }
+    .api-docs .method { color: #a6e3a1; font-weight: 700; }
+
     .not-found {
       text-align: center;
       padding: 32px;
@@ -157,7 +165,6 @@
     .not-found.show { display: block; }
     .not-found-icon { font-size: 2.5rem; margin-bottom: 12px; }
 
-    /* 快捷按钮 */
     .quick-btns {
       display: flex;
       gap: 10px;
@@ -197,8 +204,19 @@
   </nav>
 
   <div class="api-wrap">
-    <h2 class="section-title">项家<span class="highlight">两兄弟</span></h2>
+    <h2 class="section-title">项家<span class="highlight">两兄弟</span> API</h2>
     <p class="api-desc">输入姓名，获取专属介绍 🐉</p>
+
+    <!-- API 调用说明 -->
+    <div class="api-docs">
+      <div class="comment"># API 接口地址</div>
+      <div><span class="method">GET</span> <span class="url">/api/xiong?name=项羽</span></div>
+      <br>
+      <div class="comment"># 用 fetch 调用示例</div>
+      <div>fetch(<span class="json-str">'https://你的域名/api/xiong?name=项羽'</span>)</div>
+      <div>&nbsp;&nbsp;.then(r => r.json())</div>
+      <div>&nbsp;&nbsp;.then(data => console.log(data))</div>
+    </div>
 
     <div class="quick-btns">
       <button class="quick-btn" onclick="query('项羽')">项羽</button>
@@ -236,114 +254,47 @@
   </div>
 
   <script>
-    // 导航
     const navbar = document.querySelector('.navbar');
     window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 20));
     document.getElementById('navToggle').addEventListener('click', () => {
       document.querySelector('.nav-links').classList.toggle('open');
     });
 
-    // 数据库
-    const database = {
-      '项羽': {
-        avatar: '⚔️',
-        tag: '西楚霸王',
-        text: `项羽（公元前232年—公元前202年），名籍，字羽，楚国下相人，西楚霸王。
-
-他力拔山兮气盖世，巨鹿之战以少胜多，大破秦军，威震天下。鸿门宴上放走刘邦，留下千古遗憾。
-
-最终被围垓下，四面楚歌，乌江自刎，英雄末路，令人扼腕。
-
-"生当作人杰，死亦为鬼雄。" —— 李清照`,
-      },
-      '项庄': {
-        avatar: '🗡️',
-        tag: '项羽堂弟',
-        text: `项庄，项羽的堂弟，楚军将领。
-
-鸿门宴上，项庄奉范增之命，以"舞剑助兴"为由，意图刺杀刘邦。
-
-然而项伯挺身而出，也拔剑起舞，以身护住刘邦，使项庄无从下手。
-
-"项庄舞剑，意在沛公" —— 此典故流传千古。`,
-      },
-      '项伯': {
-        avatar: '🛡️',
-        tag: '项羽叔父',
-        text: `项伯，项羽的叔父，为人重情义。
-
-鸿门宴前夜，他连夜奔赴刘邦营地，私告张良，救了刘邦一命。宴上又以身护住刘邦，阻止项庄行刺。
-
-后来汉朝建立，刘邦感念其恩，赐其刘姓，封射阳侯。
-
-项伯的"仁义"，某种程度上改变了历史走向。`,
-      },
-      '项梁': {
-        avatar: '👑',
-        tag: '项羽叔父·起义首领',
-        text: `项梁，项羽的叔父，楚国名将项燕之子。
-
-秦末天下大乱，项梁与项羽起兵江东，拥立楚怀王，成为反秦义军的重要领袖。
-
-他慧眼识人，一手培养和带领项羽成长为顶天立地的英雄。
-
-可惜定陶一战轻敌冒进，被秦将章邯击败，壮志未酬身先死。`,
-      },
-      '项梓涵': {
-        avatar: '🏃',
-        tag: '体育健将',
-        text: `我是体育健将！`,
-      },
-      '项梓淇': {
-        avatar: '🎨',
-        tag: '画画高手',
-        text: `我是画画高手！`,
-      },
-    };
-
     document.getElementById('nameInput').addEventListener('keydown', e => {
       if (e.key === 'Enter') query();
     });
 
-    function query(name) {
+    async function query(name) {
       const input = name || document.getElementById('nameInput').value.trim();
       if (!input) return;
       document.getElementById('nameInput').value = input;
 
-      const card = document.getElementById('resultCard');
-      const notFound = document.getElementById('notFound');
-      card.classList.remove('show');
-      notFound.classList.remove('show');
+      document.getElementById('resultCard').classList.remove('show');
+      document.getElementById('notFound').classList.remove('show');
 
-      const data = database[input];
+      const res = await fetch(`/api/xiong?name=${encodeURIComponent(input)}`);
+      const data = await res.json();
 
-      if (!data) {
-        notFound.classList.add('show');
+      if (data.code === 404) {
+        document.getElementById('notFound').classList.add('show');
         return;
       }
 
-      document.getElementById('resAvatar').textContent = data.avatar;
-      document.getElementById('resName').textContent = input;
+      const avatarMap = { '西楚霸王':'⚔️', '项羽堂弟':'🗡️', '项羽叔父':'🛡️', '项羽叔父·起义首领':'👑', '体育健将':'🏃', '画画高手':'🎨' };
+      document.getElementById('resAvatar').textContent = avatarMap[data.tag] || '🐉';
+      document.getElementById('resName').textContent = data.name;
       document.getElementById('resTag').textContent = data.tag;
-      document.getElementById('resText').textContent = data.text;
-
-      // JSON 响应展示
-      const json = {
-        code: 200,
-        name: input,
-        tag: data.tag,
-        description: data.text.replace(/\n/g, ' ').trim(),
-      };
+      document.getElementById('resText').textContent = data.description;
 
       document.getElementById('jsonOutput').innerHTML =
         `<span class="json-str">{</span>\n` +
-        `  <span class="json-key">"code"</span>: <span class="json-num">${json.code}</span>,\n` +
-        `  <span class="json-key">"name"</span>: <span class="json-str">"${json.name}"</span>,\n` +
-        `  <span class="json-key">"tag"</span>: <span class="json-str">"${json.tag}"</span>,\n` +
-        `  <span class="json-key">"description"</span>: <span class="json-str">"${json.description.substring(0, 60)}..."</span>\n` +
+        `  <span class="json-key">"code"</span>: <span class="json-num">${data.code}</span>,\n` +
+        `  <span class="json-key">"name"</span>: <span class="json-str">"${data.name}"</span>,\n` +
+        `  <span class="json-key">"tag"</span>: <span class="json-str">"${data.tag}"</span>,\n` +
+        `  <span class="json-key">"description"</span>: <span class="json-str">"${data.description.substring(0, 60).replace(/\n/g,' ')}..."</span>\n` +
         `<span class="json-str">}</span>`;
 
-      card.classList.add('show');
+      document.getElementById('resultCard').classList.add('show');
     }
   </script>
 </body>
