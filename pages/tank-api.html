@@ -281,7 +281,8 @@
   <script>
     const SUPABASE_URL = 'https://vkskripbudbomgkovzaf.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrc2tyaXBidWRib21na292emFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODE0MTQsImV4cCI6MjA5MjA1NzQxNH0.0fuzKy-LPlQgNCun6QzJaM0Kj12iY1LT3_2TUyoMal4';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const { createClient } = window.supabase;
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // ===== 地图绘制 =====
     const canvas = document.getElementById('map');
@@ -413,8 +414,8 @@
     });
 
     // 初始化
-    drawMap();
-    initRealtime();
+    drawMap(); // 先画坦克，确保页面一定显示
+    try { initRealtime(); } catch(e) { console.error('Realtime init failed:', e); }
   </script>
 </body>
 </html>
