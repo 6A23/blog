@@ -275,16 +275,8 @@
     </div>
   </div>
 
-  <!-- Supabase JS SDK（Realtime） -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
   <script>
-    const SUPABASE_URL = 'https://vkskripbudbomgkovzaf.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrc2tyaXBidWRib21na292emFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODE0MTQsImV4cCI6MjA5MjA1NzQxNH0.0fuzKy-LPlQgNCun6QzJaM0Kj12iY1LT3_2TUyoMal4';
-    const { createClient } = window.supabase;
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // ===== 地图绘制 =====
+    // ===== 地图绘制（不依赖 Supabase，先执行） =====
     const canvas = document.getElementById('map');
     const ctx = canvas.getContext('2d');
     const SIZE = 12;
@@ -295,14 +287,12 @@
     function drawMap() {
       ctx.fillStyle = '#16213e';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
       ctx.strokeStyle = 'rgba(255,255,255,0.04)';
       ctx.lineWidth = 1;
       for (let i = 0; i <= SIZE; i++) {
         ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, canvas.height); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(canvas.width, i * CELL); ctx.stroke();
       }
-
       drawTank(tankX, tankY, tankDir);
     }
 
@@ -338,54 +328,17 @@
       drawMap();
     }
 
-    // ===== Supabase Realtime 订阅 =====
-    async function initRealtime() {
-      // 先读当前状态
-      const { data } = await supabase.from('tank_state').select('*').eq('id', 1).single();
-      if (data) updateHUD(data.x, data.y, data.dir, false);
-
-      // 订阅变化
-      supabase
-        .channel('tank-channel')
-        .on('postgres_changes', {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'tank_state',
-          filter: 'id=eq.1',
-        }, (payload) => {
-          const d = payload.new;
-          updateHUD(d.x, d.y, d.dir, false);
-          // 闪烁提示
-          document.getElementById('dot').style.background = '#ffd93d';
-          setTimeout(() => document.getElementById('dot').style.background = '#6bcb77', 300);
-        })
-        .subscribe((status) => {
-          const dot = document.getElementById('dot');
-          const label = document.getElementById('realtimeStatus');
-          if (status === 'SUBSCRIBED') {
-            dot.classList.remove('off');
-            label.textContent = 'Realtime 已连接 · 实时同步中';
-          } else {
-            dot.classList.add('off');
-            label.textContent = '连接中…';
-          }
-        });
-    }
-
     // ===== 控制（调用 API） =====
     async function move(dir) {
       document.querySelectorAll('.dpad-btn').forEach(b => b.classList.remove('active'));
       const btn = document.querySelector(`[data-dir="${dir}"]`);
       if (btn) { btn.classList.add('active'); setTimeout(() => btn.classList.remove('active'), 200); }
-
       const url = `/api/tank?move=${dir}`;
       document.getElementById('urlBox').textContent = window.location.origin + url;
-
       try {
         const res = await fetch(url);
         const data = await res.json();
         document.getElementById('jsonBox').textContent = JSON.stringify(data, null, 2);
-        // 位置更新由 Realtime 触发，这里不重复更新
       } catch(e) {
         document.getElementById('jsonBox').textContent = '请求失败：' + e.message;
       }
@@ -408,14 +361,55 @@
       if (!keyMap[e.key]) return;
       e.preventDefault();
       const now = Date.now();
-      if (now - lastKey < 200) return; // 防止连按过快
+      if (now - lastKey < 200) return;
       lastKey = now;
       move(keyMap[e.key]);
     });
 
-    // 初始化
-    drawMap(); // 先画坦克，确保页面一定显示
-    try { initRealtime(); } catch(e) { console.error('Realtime init failed:', e); }
+    // 先画坦克（不等 Supabase）
+    drawMap();
+  </script>
+
+  <!-- Supabase JS SDK（Realtime），异步加载后初始化 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" onload="initSupabase()" onerror="document.getElementById('realtimeStatus').textContent='Realtime 不可用'"></script>
+
+  <script>
+    function initSupabase() {
+      const SUPABASE_URL = 'https://vkskripbudbomgkovzaf.supabase.co';
+      const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrc2tyaXBidWRib21na292emFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODE0MTQsImV4cCI6MjA5MjA1NzQxNH0.0fuzKy-LPlQgNCun6QzJaM0Kj12iY1LT3_2TUyoMal4';
+      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      // 读取当前坦克位置
+      client.from('tank_state').select('*').eq('id', 1).single().then(({ data }) => {
+        if (data) updateHUD(data.x, data.y, data.dir, false);
+      });
+
+      // 订阅 Realtime 变化
+      client
+        .channel('tank-channel')
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'tank_state',
+          filter: 'id=eq.1',
+        }, (payload) => {
+          const d = payload.new;
+          updateHUD(d.x, d.y, d.dir, false);
+          document.getElementById('dot').style.background = '#ffd93d';
+          setTimeout(() => document.getElementById('dot').style.background = '#6bcb77', 300);
+        })
+        .subscribe((status) => {
+          const dot = document.getElementById('dot');
+          const label = document.getElementById('realtimeStatus');
+          if (status === 'SUBSCRIBED') {
+            dot.classList.remove('off');
+            label.textContent = 'Realtime 已连接 · 实时同步中';
+          } else {
+            dot.classList.add('off');
+            label.textContent = '连接中…';
+          }
+        });
+    }
   </script>
 </body>
 </html>
