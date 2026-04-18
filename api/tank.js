@@ -9,8 +9,8 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = 'https://swzlrvmgrsrhhhnoagfl.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_RiZmi7keAoOwg8_j9N2J0g_iGfnlPb_';
+const SUPABASE_URL = 'https://vkskripbudbomgkovzaf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrc2tyaXBidWRib21na292emFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODE0MTQsImV4cCI6MjA5MjA1NzQxNH0.0fuzKy-LPlQgNCun6QzJaM0Kj12iY1LT3_2TUyoMal4';
 
 const MAP_SIZE = 12;
 const MIN = 0;
