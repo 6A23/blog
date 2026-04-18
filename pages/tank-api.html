@@ -328,22 +328,35 @@
       drawMap();
     }
 
-    // ===== 控制（调用 API，直接用返回值更新画面） =====
-    async function move(dir) {
+    // 本地计算移动（不等网络，立即响应）
+    const dirDelta = { up:[0,-1], down:[0,1], left:[-1,0], right:[1,0] };
+    function moveLocal(dir) {
+      const [dx, dy] = dirDelta[dir];
+      const nx = tankX + dx, ny = tankY + dy;
+      const blocked = nx < 0 || nx >= SIZE || ny < 0 || ny >= SIZE;
+      updateHUD(blocked ? tankX : nx, blocked ? tankY : ny, dir, blocked);
+    }
+
+    // ===== 控制（本地立即更新，后台同步到 API） =====
+    function move(dir) {
       document.querySelectorAll('.dpad-btn').forEach(b => b.classList.remove('active'));
       const btn = document.querySelector(`[data-dir="${dir}"]`);
       if (btn) { btn.classList.add('active'); setTimeout(() => btn.classList.remove('active'), 200); }
+
+      // 1. 本地立即更新，零延迟
+      moveLocal(dir);
+
+      // 2. 后台异步同步到数据库（不阻塞画面）
       const url = `/api/tank?move=${dir}`;
       document.getElementById('urlBox').textContent = window.location.origin + url;
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        document.getElementById('jsonBox').textContent = JSON.stringify(data, null, 2);
-        // API 返回新坐标后直接更新，不依赖 Realtime
-        if (data.code === 200) updateHUD(data.x, data.y, data.dir, data.blocked);
-      } catch(e) {
-        document.getElementById('jsonBox').textContent = '请求失败：' + e.message;
-      }
+      fetch(url)
+        .then(r => r.json())
+        .then(data => {
+          document.getElementById('jsonBox').textContent = JSON.stringify(data, null, 2);
+          // 用服务端权威坐标校正（处理边界等边缘情况）
+          if (data.code === 200) updateHUD(data.x, data.y, data.dir, data.blocked);
+        })
+        .catch(e => { document.getElementById('jsonBox').textContent = '请求失败：' + e.message; });
     }
 
     // ===== 轮询（每 1 秒同步一次，接收其他人的操控） =====
