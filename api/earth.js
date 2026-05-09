@@ -8,8 +8,19 @@
  * GET /api/earth?query=facilities       → 所有虚构设施列表
  * GET /api/earth?action=launch&id=nuke1 → 发射/激活指定设施
  * GET /api/earth?action=abort&id=nuke1  → 终止指定设施
- * GET /api/earth?action=satellite&op=deploy&name=ISS-X → 部署卫星
  * GET /api/earth?action=alert&level=5   → 设置全球威胁等级（1-10）
+ *
+ * 🌕 月球机器人建造系统
+ * GET /api/earth?query=moon             → 查看月球基地总览
+ * GET /api/earth?query=moon_robots      → 查看所有机器人状态
+ * GET /api/earth?query=moon_progress    → 查看建造工程进度
+ * GET /api/earth?query=moon_materials   → 查看材料库存
+ * GET /api/earth?action=moon_report&robot=R1&stage=地基&progress=80&msg=xxx
+ *                                       → 机器人汇报工程进度
+ * GET /api/earth?action=moon_request&robot=R1&material=钢梁&amount=50&reason=xxx
+ *                                       → 机器人申请建造材料
+ * GET /api/earth?action=moon_supply&material=钢梁&amount=50
+ *                                       → 地球批准并发送补给
  */
 
 // ── 地球实时状态（基于真实数量级的模拟数据）──
@@ -129,6 +140,186 @@ const eventLog = [
 // ── 工具函数 ──
 function now() { return new Date().toISOString(); }
 
+// ══════════════════════════════════════════════
+// 🌕 月球机器人建造系统
+// ══════════════════════════════════════════════
+
+// 月球基地总信息
+const moonBase = {
+  name: '月球静海基地 LUNA-1',
+  location: '月球静海 0.67°N 23.47°E',
+  established: '2026-01-15',
+  total_area_m2: 0,         // 随建造增长
+  phase: '第二期：居住舱建造',
+  overall_progress_pct: 37,
+};
+
+// 建造阶段与进度
+const buildingStages = {
+  '地基': {
+    name: '地基工程',
+    icon: '🏗️',
+    status: 'completed',
+    progress_pct: 100,
+    assigned_robots: ['R1', 'R2'],
+    started: '2026-01-15',
+    completed: '2026-02-20',
+    note: '月壤夯实完毕，承重测试通过',
+  },
+  '骨架': {
+    name: '钢架结构',
+    icon: '🔩',
+    status: 'completed',
+    progress_pct: 100,
+    assigned_robots: ['R1', 'R3'],
+    started: '2026-02-21',
+    completed: '2026-03-30',
+    note: '主体钢架安装完毕',
+  },
+  '居住舱': {
+    name: '居住舱安装',
+    icon: '🛸',
+    status: 'in_progress',
+    progress_pct: 62,
+    assigned_robots: ['R2', 'R4', 'R5'],
+    started: '2026-04-01',
+    completed: null,
+    note: '气密测试进行中',
+  },
+  '能源系统': {
+    name: '太阳能板 & 核电池',
+    icon: '⚡',
+    status: 'in_progress',
+    progress_pct: 45,
+    assigned_robots: ['R3'],
+    started: '2026-04-10',
+    completed: null,
+    note: '太阳能板阵列铺设 45%',
+  },
+  '生命保障': {
+    name: '空气 & 水循环系统',
+    icon: '💧',
+    status: 'pending',
+    progress_pct: 0,
+    assigned_robots: [],
+    started: null,
+    completed: null,
+    note: '等待居住舱完工后开始',
+  },
+  '通信塔': {
+    name: '地月通信天线塔',
+    icon: '📡',
+    status: 'pending',
+    progress_pct: 0,
+    assigned_robots: [],
+    started: null,
+    completed: null,
+    note: '材料已申请，等待运输',
+  },
+};
+
+// 机器人列表
+const moonRobots = {
+  'R1': {
+    id: 'R1',
+    name: '建造机器人 阿波罗-1',
+    icon: '🤖',
+    status: 'working',
+    current_task: '居住舱气密封板焊接',
+    current_stage: '居住舱',
+    battery_pct: 88,
+    location: '居住舱 A 区',
+    total_reports: 14,
+    last_report: null,
+  },
+  'R2': {
+    id: 'R2',
+    name: '建造机器人 阿波罗-2',
+    icon: '🤖',
+    status: 'working',
+    current_task: '太阳能板支架固定',
+    current_stage: '能源系统',
+    battery_pct: 72,
+    location: '基地东侧能源区',
+    total_reports: 11,
+    last_report: null,
+  },
+  'R3': {
+    id: 'R3',
+    name: '建造机器人 阿波罗-3',
+    icon: '🤖',
+    status: 'charging',
+    current_task: '充电待命',
+    current_stage: null,
+    battery_pct: 31,
+    location: '充电站 C2',
+    total_reports: 9,
+    last_report: null,
+  },
+  'R4': {
+    id: 'R4',
+    name: '建造机器人 阿波罗-4',
+    icon: '🤖',
+    status: 'working',
+    current_task: '居住舱内壁隔热层铺设',
+    current_stage: '居住舱',
+    battery_pct: 95,
+    location: '居住舱 B 区',
+    total_reports: 7,
+    last_report: null,
+  },
+  'R5': {
+    id: 'R5',
+    name: '建造机器人 阿波罗-5',
+    icon: '🤖',
+    status: 'standby',
+    current_task: '等待材料补给',
+    current_stage: '居住舱',
+    battery_pct: 100,
+    location: '物资仓库',
+    total_reports: 5,
+    last_report: null,
+  },
+};
+
+// 月球材料库存
+const moonMaterials = {
+  '钢梁':     { name: '钢梁',     icon: '🔩', unit: '根', stock: 42,  capacity: 200, status: 'ok' },
+  '气密板':   { name: '气密板',   icon: '🪟', unit: '块', stock: 8,   capacity: 100, status: 'low' },
+  '隔热棉':   { name: '隔热棉',   icon: '🧱', unit: '卷', stock: 15,  capacity: 80,  status: 'ok' },
+  '太阳能板': { name: '太阳能板', icon: '☀️', unit: '片', stock: 24,  capacity: 120, status: 'ok' },
+  '水管':     { name: '水管',     icon: '🚿', unit: '米', stock: 0,   capacity: 500, status: 'empty' },
+  '电缆':     { name: '电缆',     icon: '🔌', unit: '米', stock: 380, capacity: 1000,status: 'ok' },
+  '月壤固化剂':{ name: '月壤固化剂',icon: '🧪', unit: '桶', stock: 3,  capacity: 50,  status: 'low' },
+  '氧气罐':   { name: '氧气罐',   icon: '💨', unit: '瓶', stock: 60,  capacity: 200, status: 'ok' },
+};
+
+// 材料申请队列
+const materialRequests = [
+  {
+    id: 'REQ-001',
+    robot: 'R5',
+    material: '气密板',
+    amount: 30,
+    reason: '居住舱 B 区外壁封闭需要，当前库存不足',
+    status: 'approved',
+    time: '2026-05-09T10:30:00Z',
+    approved_by: '地球指挥中心',
+  },
+  {
+    id: 'REQ-002',
+    robot: 'R2',
+    material: '太阳能板',
+    amount: 20,
+    reason: '能源系统第二阵列铺设，预计还需 20 片',
+    status: 'pending',
+    time: '2026-05-09T13:15:00Z',
+    approved_by: null,
+  },
+];
+
+let reqCounter = 3; // 申请编号计数器
+
 export default function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -136,14 +327,14 @@ export default function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const { query, action, id, level, op, name } = req.query;
+  const { query, action, id, level, op, name, robot, stage, progress, msg, material, amount, reason } = req.query;
 
   // ── 无参数：返回总览 ──
   if (!query && !action) {
     return res.status(200).json({
       code: 200,
       title: '🌍 地球指挥中心',
-      version: 'ECC-v3.7',
+      version: 'ECC-v3.8',
       timestamp: now(),
       threat_level: threatLevel,
       threat_label: threatLabels[threatLevel],
@@ -155,15 +346,29 @@ export default function handler(req, res) {
       },
       active_facilities: Object.values(facilities).filter(f => f.status === 'active').length,
       total_facilities: Object.keys(facilities).length,
+      moon_base: {
+        name: moonBase.name,
+        phase: moonBase.phase,
+        overall_progress_pct: moonBase.overall_progress_pct,
+        active_robots: Object.values(moonRobots).filter(r => r.status === 'working').length,
+        pending_requests: materialRequests.filter(r => r.status === 'pending').length,
+      },
       recent_events: eventLog.slice(0, 3),
       endpoints: {
-        status:     '/api/earth?query=status',
-        threat:     '/api/earth?query=threat',
-        events:     '/api/earth?query=events',
-        facilities: '/api/earth?query=facilities',
-        launch:     '/api/earth?action=launch&id=nuke1',
-        abort:      '/api/earth?action=abort&id=nuke1',
-        alert:      '/api/earth?action=alert&level=5',
+        status:          '/api/earth?query=status',
+        threat:          '/api/earth?query=threat',
+        events:          '/api/earth?query=events',
+        facilities:      '/api/earth?query=facilities',
+        launch:          '/api/earth?action=launch&id=nuke1',
+        abort:           '/api/earth?action=abort&id=nuke1',
+        alert:           '/api/earth?action=alert&level=5',
+        moon:            '/api/earth?query=moon',
+        moon_robots:     '/api/earth?query=moon_robots',
+        moon_progress:   '/api/earth?query=moon_progress',
+        moon_materials:  '/api/earth?query=moon_materials',
+        moon_report:     '/api/earth?action=moon_report&robot=R1&stage=居住舱&progress=65&msg=气密焊接完成',
+        moon_request:    '/api/earth?action=moon_request&robot=R1&material=气密板&amount=20&reason=B区封闭需要',
+        moon_supply:     '/api/earth?action=moon_supply&material=气密板&amount=20',
       },
     });
   }
@@ -327,6 +532,275 @@ export default function handler(req, res) {
       new_level: threatLevel,
       new_label: threatLabels[threatLevel],
       message: `🚨 全球威胁等级已更新为 ${threatLabels[threatLevel]}`,
+      timestamp: now(),
+    });
+  }
+
+  // ════════════════════════════════════════════
+  // 🌕 月球机器人建造系统 — 查询路由
+  // ════════════════════════════════════════════
+
+  // ── query=moon：月球基地总览 ──
+  if (query === 'moon') {
+    const stages = Object.values(buildingStages);
+    const overall = Math.round(stages.reduce((s, st) => s + st.progress_pct, 0) / stages.length);
+    moonBase.overall_progress_pct = overall;
+    return res.status(200).json({
+      code: 200,
+      query: 'moon',
+      base: moonBase,
+      robots_summary: {
+        total: Object.keys(moonRobots).length,
+        working:  Object.values(moonRobots).filter(r => r.status === 'working').length,
+        charging: Object.values(moonRobots).filter(r => r.status === 'charging').length,
+        standby:  Object.values(moonRobots).filter(r => r.status === 'standby').length,
+      },
+      materials_alert: Object.values(moonMaterials)
+        .filter(m => m.status === 'low' || m.status === 'empty')
+        .map(m => ({ name: m.name, icon: m.icon, stock: m.stock, status: m.status })),
+      pending_requests: materialRequests.filter(r => r.status === 'pending').length,
+      tip: '使用 ?query=moon_robots / moon_progress / moon_materials 查看详情',
+    });
+  }
+
+  // ── query=moon_robots：所有机器人状态 ──
+  if (query === 'moon_robots') {
+    return res.status(200).json({
+      code: 200,
+      query: 'moon_robots',
+      total: Object.keys(moonRobots).length,
+      robots: Object.values(moonRobots),
+      tip: '使用 ?action=moon_report&robot=R1&stage=居住舱&progress=65&msg=... 汇报工程进度',
+    });
+  }
+
+  // ── query=moon_progress：建造工程进度 ──
+  if (query === 'moon_progress') {
+    const stages = Object.values(buildingStages);
+    const overall = Math.round(stages.reduce((s, st) => s + st.progress_pct, 0) / stages.length);
+    moonBase.overall_progress_pct = overall;
+    return res.status(200).json({
+      code: 200,
+      query: 'moon_progress',
+      overall_progress_pct: overall,
+      phase: moonBase.phase,
+      stages: buildingStages,
+      tip: '使用 ?action=moon_report 提交进度更新',
+    });
+  }
+
+  // ── query=moon_materials：材料库存 & 申请记录 ──
+  if (query === 'moon_materials') {
+    return res.status(200).json({
+      code: 200,
+      query: 'moon_materials',
+      inventory: moonMaterials,
+      requests: materialRequests,
+      alerts: Object.values(moonMaterials).filter(m => m.status !== 'ok').map(m => ({
+        material: m.name,
+        icon: m.icon,
+        stock: m.stock,
+        unit: m.unit,
+        status: m.status,
+        warning: m.status === 'empty' ? '⛔ 库存为零，建造将停滞' : '⚠️ 库存偏低，请尽快补给',
+      })),
+      tip: '使用 ?action=moon_request 申请材料，?action=moon_supply 批准发送补给',
+    });
+  }
+
+  // ════════════════════════════════════════════
+  // 🌕 月球机器人建造系统 — 操作路由
+  // ════════════════════════════════════════════
+
+  // ── action=moon_report：机器人汇报工程进度 ──
+  if (action === 'moon_report') {
+    if (!robot || !moonRobots[robot]) {
+      return res.status(404).json({
+        code: 404,
+        message: `机器人 "${robot}" 不存在，可用：${Object.keys(moonRobots).join(', ')}`,
+      });
+    }
+    if (!stage || !buildingStages[stage]) {
+      return res.status(400).json({
+        code: 400,
+        message: `stage 参数 "${stage}" 无效，可用阶段：${Object.keys(buildingStages).join('、')}`,
+      });
+    }
+    const prog = parseInt(progress, 10);
+    if (isNaN(prog) || prog < 0 || prog > 100) {
+      return res.status(400).json({
+        code: 400,
+        message: 'progress 参数必须是 0~100 的整数',
+      });
+    }
+
+    const r = moonRobots[robot];
+    const s = buildingStages[stage];
+    const oldProgress = s.progress_pct;
+    s.progress_pct = prog;
+    if (prog === 100 && s.status !== 'completed') {
+      s.status = 'completed';
+      s.completed = now();
+    } else if (prog > 0 && s.status === 'pending') {
+      s.status = 'in_progress';
+      s.started = s.started || now();
+    }
+    if (!s.assigned_robots.includes(robot)) s.assigned_robots.push(robot);
+    r.current_stage = stage;
+    r.last_report = now();
+    r.total_reports += 1;
+    const reportMsg = msg || `${stage}阶段进度更新至 ${prog}%`;
+
+    // 写入事件日志
+    eventLog.unshift({
+      time: now(),
+      level: prog === 100 ? 'INFO' : 'INFO',
+      icon: '🌕',
+      msg: `[月球汇报] ${r.name}（${robot}）· ${s.icon}${stage}：${oldProgress}% → ${prog}% · ${reportMsg}`,
+    });
+
+    // 重算总进度
+    const allStages = Object.values(buildingStages);
+    moonBase.overall_progress_pct = Math.round(allStages.reduce((acc, st) => acc + st.progress_pct, 0) / allStages.length);
+
+    return res.status(200).json({
+      code: 200,
+      action: 'moon_report',
+      success: true,
+      robot: r,
+      stage: s,
+      old_progress: oldProgress,
+      new_progress: prog,
+      overall_progress_pct: moonBase.overall_progress_pct,
+      message: `✅ 收到 ${r.name} 的工程汇报：${stage} ${prog}%`,
+      timestamp: now(),
+    });
+  }
+
+  // ── action=moon_request：机器人申请材料 ──
+  if (action === 'moon_request') {
+    if (!robot || !moonRobots[robot]) {
+      return res.status(404).json({
+        code: 404,
+        message: `机器人 "${robot}" 不存在，可用：${Object.keys(moonRobots).join(', ')}`,
+      });
+    }
+    if (!material) {
+      return res.status(400).json({
+        code: 400,
+        message: 'material 参数不能为空，例如：&material=钢梁',
+      });
+    }
+    const amt = parseInt(amount, 10);
+    if (isNaN(amt) || amt <= 0) {
+      return res.status(400).json({
+        code: 400,
+        message: 'amount 参数必须是正整数',
+      });
+    }
+    const reqId = `REQ-${String(reqCounter++).padStart(3, '0')}`;
+    const newReq = {
+      id: reqId,
+      robot,
+      material,
+      amount: amt,
+      reason: reason || '建造任务需要',
+      status: 'pending',
+      time: now(),
+      approved_by: null,
+    };
+    materialRequests.push(newReq);
+    moonRobots[robot].last_report = now();
+
+    eventLog.unshift({
+      time: now(),
+      level: 'WARN',
+      icon: '📦',
+      msg: `[月球申请] ${moonRobots[robot].name} 申请 ${material} × ${amt} · 原因：${newReq.reason}`,
+    });
+
+    // 如果是库存为零的紧急材料，标记为 CRITICAL
+    if (moonMaterials[material] && moonMaterials[material].status === 'empty') {
+      eventLog[0].level = 'CRITICAL';
+      eventLog[0].icon = '⛔';
+    }
+
+    return res.status(200).json({
+      code: 200,
+      action: 'moon_request',
+      success: true,
+      request: newReq,
+      current_stock: moonMaterials[material]
+        ? { stock: moonMaterials[material].stock, unit: moonMaterials[material].unit }
+        : { note: '该材料不在已知库存中' },
+      message: `📦 材料申请 ${reqId} 已提交，等待地球指挥中心审批`,
+      tip: `地球指挥中心可使用 /api/earth?action=moon_supply&material=${encodeURIComponent(material)}&amount=${amt} 批准并发送补给`,
+    });
+  }
+
+  // ── action=moon_supply：地球批准并发送补给 ──
+  if (action === 'moon_supply') {
+    if (!material) {
+      return res.status(400).json({
+        code: 400,
+        message: 'material 参数不能为空',
+      });
+    }
+    const amt = parseInt(amount, 10);
+    if (isNaN(amt) || amt <= 0) {
+      return res.status(400).json({
+        code: 400,
+        message: 'amount 参数必须是正整数',
+      });
+    }
+
+    // 更新库存
+    if (moonMaterials[material]) {
+      moonMaterials[material].stock += amt;
+      const m = moonMaterials[material];
+      const ratio = m.stock / m.capacity;
+      m.status = ratio === 0 ? 'empty' : ratio < 0.2 ? 'low' : 'ok';
+    } else {
+      // 新材料，自动创建
+      moonMaterials[material] = {
+        name: material, icon: '📦', unit: '个',
+        stock: amt, capacity: amt * 2, status: 'ok',
+      };
+    }
+
+    // 将待审批的同类申请标为 approved
+    materialRequests.forEach(r => {
+      if (r.material === material && r.status === 'pending') {
+        r.status = 'approved';
+        r.approved_by = '地球指挥中心';
+      }
+    });
+
+    // R5 如果在等待材料，改为 working
+    Object.values(moonRobots).forEach(r => {
+      if (r.status === 'standby' && r.current_task === '等待材料补给') {
+        r.status = 'working';
+        r.current_task = `处理补给材料：${material}`;
+      }
+    });
+
+    eventLog.unshift({
+      time: now(),
+      level: 'INFO',
+      icon: '🚀',
+      msg: `[地球补给] 补给舱已发射 · ${material} × ${amt} → 月球静海基地，预计 3 天抵达`,
+    });
+
+    return res.status(200).json({
+      code: 200,
+      action: 'moon_supply',
+      success: true,
+      material,
+      amount_sent: amt,
+      new_stock: moonMaterials[material].stock,
+      unit: moonMaterials[material].unit,
+      approved_requests: materialRequests.filter(r => r.material === material && r.status === 'approved').length,
+      message: `🚀 补给舱已发射！${material} × ${amt} 正在前往月球，预计 3 天后抵达`,
       timestamp: now(),
     });
   }

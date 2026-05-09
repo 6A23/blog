@@ -562,6 +562,286 @@
     /* ── 全宽面板 ── */
     .full-panel { margin-bottom: 20px; }
 
+    /* ── 月球基地分隔标题 ── */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 32px 0 16px;
+    }
+
+    .section-divider-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(180,120,255,0.3), transparent);
+    }
+
+    .section-divider-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      letter-spacing: 4px;
+      color: #b47fff;
+      text-shadow: 0 0 12px rgba(180,120,255,0.5);
+      white-space: nowrap;
+    }
+
+    /* 月球面板用紫色主题 */
+    .moon-panel {
+      --moon-color: #b47fff;
+      --moon-glow: 0 0 12px rgba(180,120,255,0.4);
+      border-color: rgba(180,120,255,0.2);
+    }
+
+    .moon-panel .panel-header {
+      background: rgba(180,120,255,0.04);
+      border-bottom-color: rgba(180,120,255,0.15);
+    }
+
+    .moon-panel .panel-title { color: #b47fff; text-shadow: 0 0 10px rgba(180,120,255,0.4); }
+
+    /* ── 建造进度条 ── */
+    .stage-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .stage-item {
+      background: rgba(180,120,255,0.04);
+      border: 1px solid rgba(180,120,255,0.12);
+      border-radius: 10px;
+      padding: 12px 16px;
+    }
+
+    .stage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .stage-name {
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+
+    .stage-pct {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .stage-bar-track {
+      height: 6px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .stage-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.8s ease;
+    }
+
+    .stage-status-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .stage-completed { background: rgba(0,255,136,0.1);  color: var(--green); border: 1px solid rgba(0,255,136,0.25); }
+    .stage-in_progress { background: rgba(180,120,255,0.1); color: #b47fff; border: 1px solid rgba(180,120,255,0.3); animation: blink 2s infinite; }
+    .stage-pending { background: rgba(90,120,154,0.1); color: var(--text-dim); border: 1px solid rgba(90,120,154,0.2); }
+
+    .stage-note { font-size: 0.74rem; color: var(--text-dim); }
+
+    /* ── 机器人卡片 ── */
+    .robot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 10px;
+    }
+
+    .robot-card {
+      background: rgba(180,120,255,0.04);
+      border: 1px solid rgba(180,120,255,0.12);
+      border-radius: 10px;
+      padding: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .robot-card:hover { border-color: rgba(180,120,255,0.3); }
+
+    .robot-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .robot-name { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+
+    .robot-status-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+
+    .robot-task { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px; }
+
+    .robot-battery {
+      height: 5px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+
+    .robot-battery-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.5s;
+    }
+
+    .robot-battery-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+    }
+
+    .robot-btns { display: flex; gap: 6px; margin-top: 10px; }
+
+    /* ── 材料库存 ── */
+    .material-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .material-card {
+      background: rgba(180,120,255,0.04);
+      border: 1px solid rgba(180,120,255,0.12);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+
+    .material-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .material-name { font-size: 0.82rem; font-weight: 600; }
+    .material-icon { font-size: 1.2rem; }
+
+    .material-stock-bar {
+      height: 5px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 5px;
+    }
+
+    .material-stock-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.5s;
+    }
+
+    .material-stock-ok    { background: var(--green); }
+    .material-stock-low   { background: var(--orange); }
+    .material-stock-empty { background: var(--red); }
+
+    .material-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.73rem;
+    }
+
+    .material-count { font-family: 'JetBrains Mono', monospace; color: var(--text); }
+    .material-alert { font-size: 0.7rem; }
+    .material-alert.low { color: var(--orange); }
+    .material-alert.empty { color: var(--red); }
+
+    /* ── 材料申请面板 ── */
+    .request-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-end;
+      margin-bottom: 20px;
+      padding: 16px;
+      background: rgba(180,120,255,0.04);
+      border: 1px solid rgba(180,120,255,0.12);
+      border-radius: 10px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-label { font-size: 0.72rem; color: var(--text-dim); letter-spacing: 1px; }
+
+    .form-input {
+      padding: 8px 12px;
+      background: rgba(180,120,255,0.06);
+      border: 1px solid rgba(180,120,255,0.2);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      outline: none;
+      min-width: 120px;
+    }
+
+    .form-input:focus { border-color: rgba(180,120,255,0.5); }
+
+    .btn-moon {
+      background: rgba(180,120,255,0.15);
+      color: #b47fff;
+      border: 1px solid rgba(180,120,255,0.35);
+    }
+
+    .btn-moon:hover {
+      background: rgba(180,120,255,0.28);
+      box-shadow: 0 0 12px rgba(180,120,255,0.4);
+    }
+
+    /* ── 申请记录 ── */
+    .req-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .req-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgba(180,120,255,0.03);
+      border: 1px solid rgba(180,120,255,0.1);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      flex-wrap: wrap;
+    }
+
+    .req-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    .req-info { flex: 1; min-width: 0; }
+    .req-title { color: var(--text); margin-bottom: 2px; }
+    .req-reason { font-size: 0.72rem; color: var(--text-dim); }
+
+    .req-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .req-pending  { background: rgba(255,179,71,0.1); color: var(--orange); border: 1px solid rgba(255,179,71,0.25); }
+    .req-approved { background: rgba(0,255,136,0.1);  color: var(--green);  border: 1px solid rgba(0,255,136,0.25); }
+
     /* ── 响应式 ── */
     @media (max-width: 560px) {
       .ecc-wrap { padding: 80px 14px 50px; }
@@ -577,7 +857,7 @@
   <!-- 导航 -->
   <nav class="navbar">
     <a href="../index.html" class="nav-logo">← 主页</a>
-    <span class="nav-title">EARTH COMMAND CENTER · ECC-v3.7</span>
+    <span class="nav-title">EARTH COMMAND CENTER · ECC-v3.8</span>
     <span class="nav-time" id="navTime">--:--:--</span>
   </nav>
 
@@ -586,7 +866,7 @@
     <!-- 页头 -->
     <div class="ecc-header">
       <h1>🌍 EARTH COMMAND CENTER</h1>
-      <p class="sub">GLOBAL THREAT MONITORING · FACILITY CONTROL · EVENT LOGGING</p>
+      <p class="sub">GLOBAL THREAT MONITORING · FACILITY CONTROL · LUNAR BASE COMMAND</p>
     </div>
 
     <!-- 威胁等级横幅 -->
@@ -659,6 +939,170 @@
         <div class="facility-list" id="facilityList">
           <div style="color:var(--text-dim);font-size:0.82rem;padding:20px;text-align:center">载入中...</div>
         </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- 🌕 月球基地模块分隔 -->
+    <div class="section-divider">
+      <div class="section-divider-line"></div>
+      <span class="section-divider-label">🌕 LUNAR BASE COMMAND — LUNA-1</span>
+      <div class="section-divider-line"></div>
+    </div>
+
+    <!-- 月球工程进度 + 机器人状态 -->
+    <div class="main-grid">
+
+      <!-- 建造工程进度 -->
+      <div class="panel moon-panel">
+        <div class="panel-header">
+          <span class="panel-title">▶ 建造工程进度</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <button class="btn btn-moon" style="padding:4px 12px;font-size:0.75rem" onclick="loadMoonProgress()">刷新</button>
+            <div class="panel-dot" style="background:#b47fff;box-shadow:0 0 8px rgba(180,120,255,0.5)"></div>
+          </div>
+        </div>
+        <div class="panel-body" style="padding:14px">
+          <!-- 总进度 -->
+          <div style="margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+              <span style="font-size:0.78rem;color:var(--text-dim);letter-spacing:1px">OVERALL PROGRESS</span>
+              <span class="stage-pct" id="overallPct" style="color:#b47fff">--</span>
+            </div>
+            <div class="stage-bar-track">
+              <div id="overallBarFill" class="stage-bar-fill" style="background:linear-gradient(90deg,#7b4fff,#b47fff);width:0%"></div>
+            </div>
+          </div>
+          <div class="stage-list" id="stageList">
+            <div style="color:var(--text-dim);font-size:0.82rem;padding:10px;text-align:center">载入中...</div>
+          </div>
+          <!-- 机器人汇报表单 -->
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(180,120,255,0.12)">
+            <div style="font-size:0.72rem;color:#b47fff;letter-spacing:2px;margin-bottom:10px">▶ 提交工程汇报</div>
+            <div class="request-form" style="padding:12px">
+              <div class="form-group">
+                <span class="form-label">机器人 ID</span>
+                <select class="form-input" id="reportRobot" style="min-width:100px">
+                  <option value="R1">R1 阿波罗-1</option>
+                  <option value="R2">R2 阿波罗-2</option>
+                  <option value="R3">R3 阿波罗-3</option>
+                  <option value="R4">R4 阿波罗-4</option>
+                  <option value="R5">R5 阿波罗-5</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <span class="form-label">建造阶段</span>
+                <select class="form-input" id="reportStage">
+                  <option value="地基">地基工程</option>
+                  <option value="骨架">钢架结构</option>
+                  <option value="居住舱" selected>居住舱</option>
+                  <option value="能源系统">能源系统</option>
+                  <option value="生命保障">生命保障</option>
+                  <option value="通信塔">通信塔</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <span class="form-label">进度 0-100</span>
+                <input type="number" class="form-input" id="reportProgress" value="65" min="0" max="100" style="min-width:80px" />
+              </div>
+              <div class="form-group" style="flex:1;min-width:140px">
+                <span class="form-label">汇报内容</span>
+                <input type="text" class="form-input" id="reportMsg" placeholder="例：气密焊接完成" />
+              </div>
+              <button class="btn btn-moon" onclick="submitReport()">📡 发送汇报</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 机器人状态 -->
+      <div class="panel moon-panel">
+        <div class="panel-header">
+          <span class="panel-title">▶ 机器人状态</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <button class="btn btn-moon" style="padding:4px 12px;font-size:0.75rem" onclick="loadRobots()">刷新</button>
+            <div class="panel-dot" style="background:#b47fff;box-shadow:0 0 8px rgba(180,120,255,0.5)"></div>
+          </div>
+        </div>
+        <div class="panel-body" style="padding:14px">
+          <div class="robot-grid" id="robotGrid">
+            <div style="color:var(--text-dim);font-size:0.82rem;padding:10px;text-align:center">载入中...</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 材料库存 + 申请补给 -->
+    <div class="panel moon-panel full-panel">
+      <div class="panel-header">
+        <span class="panel-title">▶ 材料库存 & 补给申请</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn btn-moon" style="padding:4px 12px;font-size:0.75rem" onclick="loadMaterials()">刷新</button>
+          <div class="panel-dot" style="background:#b47fff;box-shadow:0 0 8px rgba(180,120,255,0.5)"></div>
+        </div>
+      </div>
+      <div class="panel-body" style="padding:14px">
+
+        <!-- 材料库存格 -->
+        <div class="material-grid" id="materialGrid" style="margin-bottom:20px">
+          <div style="color:var(--text-dim);font-size:0.82rem;padding:10px;text-align:center">载入中...</div>
+        </div>
+
+        <!-- 申请表单 -->
+        <div style="padding-top:14px;border-top:1px solid rgba(180,120,255,0.12)">
+          <div style="font-size:0.72rem;color:#b47fff;letter-spacing:2px;margin-bottom:10px">▶ 机器人申请材料</div>
+          <div class="request-form">
+            <div class="form-group">
+              <span class="form-label">申请机器人</span>
+              <select class="form-input" id="reqRobot">
+                <option value="R1">R1 阿波罗-1</option>
+                <option value="R2">R2 阿波罗-2</option>
+                <option value="R3">R3 阿波罗-3</option>
+                <option value="R4">R4 阿波罗-4</option>
+                <option value="R5" selected>R5 阿波罗-5</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <span class="form-label">材料名称</span>
+              <input type="text" class="form-input" id="reqMaterial" placeholder="例：气密板" value="气密板" />
+            </div>
+            <div class="form-group">
+              <span class="form-label">数量</span>
+              <input type="number" class="form-input" id="reqAmount" value="20" min="1" style="min-width:80px" />
+            </div>
+            <div class="form-group" style="flex:1;min-width:160px">
+              <span class="form-label">申请原因</span>
+              <input type="text" class="form-input" id="reqReason" placeholder="例：居住舱B区封闭需要" />
+            </div>
+            <button class="btn btn-moon" onclick="submitRequest()">📦 提交申请</button>
+          </div>
+        </div>
+
+        <!-- 批准补给（地球指挥中心操作） -->
+        <div style="padding-top:14px;border-top:1px solid rgba(180,120,255,0.12)">
+          <div style="font-size:0.72rem;color:var(--green);letter-spacing:2px;margin-bottom:10px">▶ 地球指挥中心：批准并发射补给舱</div>
+          <div class="request-form" style="background:rgba(0,255,136,0.03);border-color:rgba(0,255,136,0.12)">
+            <div class="form-group">
+              <span class="form-label">材料名称</span>
+              <input type="text" class="form-input" id="supplyMaterial" placeholder="例：气密板" value="气密板" style="border-color:rgba(0,255,136,0.2)" />
+            </div>
+            <div class="form-group">
+              <span class="form-label">补给数量</span>
+              <input type="number" class="form-input" id="supplyAmount" value="30" min="1" style="min-width:80px;border-color:rgba(0,255,136,0.2)" />
+            </div>
+            <button class="btn btn-green" onclick="sendSupply()">🚀 发射补给舱</button>
+          </div>
+        </div>
+
+        <!-- 申请记录 -->
+        <div style="padding-top:14px;border-top:1px solid rgba(180,120,255,0.12)">
+          <div style="font-size:0.72rem;color:var(--text-dim);letter-spacing:2px;margin-bottom:10px">▶ 申请记录</div>
+          <div class="req-list" id="reqList">
+            <div style="color:var(--text-dim);font-size:0.82rem;padding:10px;text-align:center">载入中...</div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -877,6 +1321,13 @@
       { path: '/api/earth?action=abort&id=nuke1',    desc: '终止 MX-9 导弹' },
       { path: '/api/earth?action=alert&level=5',     desc: '设置威胁等级为 5' },
       { path: '/api/earth?action=alert&level=1',     desc: '解除威胁，恢复和平' },
+      { path: '/api/earth?query=moon',               desc: '🌕 月球基地总览' },
+      { path: '/api/earth?query=moon_robots',        desc: '🤖 所有机器人状态' },
+      { path: '/api/earth?query=moon_progress',      desc: '🏗️ 建造工程进度' },
+      { path: '/api/earth?query=moon_materials',     desc: '📦 材料库存 & 申请记录' },
+      { path: '/api/earth?action=moon_report&robot=R1&stage=居住舱&progress=70&msg=焊接完成', desc: '📡 机器人汇报进度' },
+      { path: '/api/earth?action=moon_request&robot=R5&material=气密板&amount=20&reason=B区封闭', desc: '📋 申请建造材料' },
+      { path: '/api/earth?action=moon_supply&material=气密板&amount=30', desc: '🚀 批准并发射补给' },
     ];
 
     document.getElementById('apiGrid').innerHTML = apiDocs.map(a => `
@@ -887,9 +1338,170 @@
       </div>
     `).join('');
 
+    // ════════════════════════════════════════════
+    // 🌕 月球功能
+    // ════════════════════════════════════════════
+
+    // ── 加载工程进度 ──
+    async function loadMoonProgress() {
+      const data = await callAPI(API_BASE + '?query=moon_progress', '月球工程进度');
+      if (!data || data.code !== 200) return;
+      document.getElementById('overallPct').textContent = data.overall_progress_pct + '%';
+      document.getElementById('overallBarFill').style.width = data.overall_progress_pct + '%';
+
+      const stageColor = { completed: '#00ff88', in_progress: '#b47fff', pending: '#5a7a9a' };
+      document.getElementById('stageList').innerHTML = Object.values(data.stages).map(s => `
+        <div class="stage-item">
+          <div class="stage-header">
+            <span class="stage-name">${s.icon} ${s.name}</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="stage-status-badge stage-${s.status}">${s.status === 'completed' ? '✅ 完成' : s.status === 'in_progress' ? '⚙️ 进行中' : '⏳ 待开始'}</span>
+              <span class="stage-pct" style="color:${stageColor[s.status]}">${s.progress_pct}%</span>
+            </div>
+          </div>
+          <div class="stage-bar-track">
+            <div class="stage-bar-fill" style="width:${s.progress_pct}%;background:${stageColor[s.status]}"></div>
+          </div>
+          <div class="stage-note">👾 ${s.assigned_robots.length ? s.assigned_robots.join(', ') : '未分配'} · ${s.note || ''}</div>
+        </div>
+      `).join('');
+    }
+
+    // ── 加载机器人 ──
+    async function loadRobots() {
+      const data = await callAPI(API_BASE + '?query=moon_robots', '机器人状态');
+      if (!data || data.code !== 200) return;
+      const statusColor = { working: '#00ff88', charging: '#ffd93d', standby: '#5a7a9a' };
+      document.getElementById('robotGrid').innerHTML = data.robots.map(r => {
+        const bColor = r.battery_pct > 50 ? '#00ff88' : r.battery_pct > 20 ? '#ffb347' : '#ff3860';
+        return `
+        <div class="robot-card">
+          <div class="robot-header">
+            <span class="robot-name">${r.icon} ${r.id}</span>
+            <span class="robot-status-dot" style="background:${statusColor[r.status] || '#5a7a9a'};box-shadow:0 0 6px ${statusColor[r.status] || '#5a7a9a'}80"></span>
+          </div>
+          <div style="font-size:0.72rem;color:#b47fff;margin-bottom:4px;font-weight:600">${r.name.replace('建造机器人 ', '')}</div>
+          <div class="robot-task">⚙️ ${r.current_task}</div>
+          <div class="robot-task">📍 ${r.location}</div>
+          <div class="robot-battery">
+            <div class="robot-battery-fill" style="width:${r.battery_pct}%;background:${bColor}"></div>
+          </div>
+          <div class="robot-battery-label">🔋 ${r.battery_pct}% · 汇报 ${r.total_reports} 次</div>
+        </div>`;
+      }).join('');
+    }
+
+    // ── 加载材料 ──
+    async function loadMaterials() {
+      const data = await callAPI(API_BASE + '?query=moon_materials', '材料库存');
+      if (!data || data.code !== 200) return;
+
+      document.getElementById('materialGrid').innerHTML = Object.values(data.inventory).map(m => {
+        const pct = Math.round(m.stock / m.capacity * 100);
+        return `
+        <div class="material-card">
+          <div class="material-header">
+            <span class="material-name" style="color:${m.status==='empty'?'var(--red)':m.status==='low'?'var(--orange)':'var(--text)'}">${m.name}</span>
+            <span class="material-icon">${m.icon}</span>
+          </div>
+          <div class="material-stock-bar">
+            <div class="material-stock-fill material-stock-${m.status}" style="width:${pct}%"></div>
+          </div>
+          <div class="material-info">
+            <span class="material-count">${m.stock} / ${m.capacity} ${m.unit}</span>
+            ${m.status!=='ok' ? `<span class="material-alert ${m.status}">${m.status==='empty'?'⛔ 断货':'⚠️ 偏低'}</span>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+
+      document.getElementById('reqList').innerHTML = data.requests.length
+        ? data.requests.slice().reverse().map(r => `
+          <div class="req-item">
+            <span class="req-id">${r.id}</span>
+            <div class="req-info">
+              <div class="req-title">🤖 ${r.robot} 申请 <b>${r.material} × ${r.amount}</b></div>
+              <div class="req-reason">原因：${r.reason}</div>
+            </div>
+            <span class="req-status req-${r.status}">${r.status === 'pending' ? '⏳ 待审批' : '✅ 已批准'}</span>
+            ${r.status === 'pending' ? `<button class="btn btn-green btn-sm" onclick="quickSupply('${r.material}',${r.amount})">批准发射</button>` : ''}
+          </div>`).join('')
+        : '<div style="color:var(--text-dim);font-size:0.82rem;padding:10px;text-align:center">暂无申请记录</div>';
+    }
+
+    // ── 提交工程汇报 ──
+    async function submitReport() {
+      const robot    = document.getElementById('reportRobot').value;
+      const stage    = document.getElementById('reportStage').value;
+      const progress = document.getElementById('reportProgress').value;
+      const msg      = encodeURIComponent(document.getElementById('reportMsg').value || stage + '进度更新');
+      showToast(`📡 ${robot} 正在发送工程汇报...`, 'info');
+      const data = await callAPI(
+        `${API_BASE}?action=moon_report&robot=${robot}&stage=${encodeURIComponent(stage)}&progress=${progress}&msg=${msg}`,
+        '工程汇报'
+      );
+      if (data && data.code === 200) {
+        showToast(data.message, 'success');
+        await Promise.all([loadMoonProgress(), loadRobots(), loadEvents()]);
+      } else if (data) {
+        showToast(data.message || '汇报失败', 'error');
+      }
+    }
+
+    // ── 提交材料申请 ──
+    async function submitRequest() {
+      const robot    = document.getElementById('reqRobot').value;
+      const material = encodeURIComponent(document.getElementById('reqMaterial').value);
+      const amount   = document.getElementById('reqAmount').value;
+      const reason   = encodeURIComponent(document.getElementById('reqReason').value || '建造任务需要');
+      if (!document.getElementById('reqMaterial').value.trim()) {
+        showToast('请填写材料名称', 'error'); return;
+      }
+      showToast(`📦 ${robot} 正在提交申请...`, 'info');
+      const data = await callAPI(
+        `${API_BASE}?action=moon_request&robot=${robot}&material=${material}&amount=${amount}&reason=${reason}`,
+        '材料申请'
+      );
+      if (data && data.code === 200) {
+        showToast(data.message, 'success');
+        await Promise.all([loadMaterials(), loadEvents()]);
+      } else if (data) {
+        showToast(data.message || '申请失败', 'error');
+      }
+    }
+
+    // ── 发射补给 ──
+    async function sendSupply() {
+      const material = encodeURIComponent(document.getElementById('supplyMaterial').value);
+      const amount   = document.getElementById('supplyAmount').value;
+      if (!document.getElementById('supplyMaterial').value.trim()) {
+        showToast('请填写材料名称', 'error'); return;
+      }
+      showToast('🚀 正在发射补给舱...', 'info');
+      const data = await callAPI(
+        `${API_BASE}?action=moon_supply&material=${material}&amount=${amount}`,
+        '发射补给'
+      );
+      if (data && data.code === 200) {
+        showToast(data.message, 'success');
+        await Promise.all([loadMaterials(), loadRobots(), loadEvents()]);
+      } else if (data) {
+        showToast(data.message || '发射失败', 'error');
+      }
+    }
+
+    // ── 快速批准申请 ──
+    async function quickSupply(material, amount) {
+      document.getElementById('supplyMaterial').value = material;
+      document.getElementById('supplyAmount').value = amount;
+      await sendSupply();
+    }
+
     // ── 初始化加载 ──
     async function init() {
-      await Promise.all([loadThreat(), loadStatus(), loadEvents(), loadFacilities()]);
+      await Promise.all([
+        loadThreat(), loadStatus(), loadEvents(), loadFacilities(),
+        loadMoonProgress(), loadRobots(), loadMaterials(),
+      ]);
     }
 
     init();
