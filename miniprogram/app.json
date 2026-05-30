@@ -1,0 +1,15 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/room/room",
+    "pages/progress/progress",
+    "pages/earth/earth"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#001F3F",
+    "navigationBarTitleText": "月球基地建设",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#001F3F"
+  },
+  "sitemapLocation": "sitemap.json"
+}

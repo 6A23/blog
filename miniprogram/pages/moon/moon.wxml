@@ -1,0 +1,270 @@
+<view class="container">
+
+  <!-- Tab 栏 -->
+  <scroll-view scroll-x class="tab-bar-scroll">
+    <view class="tab-bar moon-tabs">
+      <view class="tab-item moon {{tab==='overview'?'active moon':''}}"  bindtap="switchTab" data-tab="overview">🌕 基地</view>
+      <view class="tab-item moon {{tab==='robots'?'active moon':''}}"    bindtap="switchTab" data-tab="robots">🤖 机器人</view>
+      <view class="tab-item moon {{tab==='progress'?'active moon':''}}"  bindtap="switchTab" data-tab="progress">📊 进度</view>
+      <view class="tab-item moon {{tab==='materials'?'active moon':''}}" bindtap="switchTab" data-tab="materials">📦 材料</view>
+      <view class="tab-item moon {{tab==='request'?'active moon':''}}"   bindtap="switchTab" data-tab="request">✉️ 操作</view>
+    </view>
+  </scroll-view>
+
+  <!-- 加载 -->
+  <view wx:if="{{loading}}" class="loading-wrap">
+    <text class="loading-icon">🌕</text>
+    <text>连接月球...</text>
+  </view>
+
+  <view class="content" wx:if="{{!loading}}">
+
+    <!-- ── 基地总览 ── -->
+    <block wx:if="{{tab==='overview' && overviewData}}">
+      <view class="card moon-card">
+        <view class="card-title moon-title">🌕 {{overviewData.base.name}}</view>
+        <view class="row">
+          <text class="row-label">建立时间</text>
+          <text class="row-value">{{overviewData.base.established}}</text>
+        </view>
+        <view class="row">
+          <text class="row-label">当前阶段</text>
+          <text class="row-value val-purple">{{overviewData.base.phase}}</text>
+        </view>
+        <view class="row">
+          <text class="row-label">总体进度</text>
+          <text class="row-value val-purple">{{overviewData.base.overall_progress_pct}}%</text>
+        </view>
+        <view class="progress-bar" style="margin:16rpx 0">
+          <view class="progress-fill fill-purple" style="width:{{overviewData.base.overall_progress_pct}}%"></view>
+        </view>
+        <view class="row">
+          <text class="row-label">坐标</text>
+          <text class="row-value" style="font-size:24rpx;color:#5a7a9a">{{overviewData.base.location}}</text>
+        </view>
+      </view>
+
+      <!-- 机器人摘要 -->
+      <view class="card">
+        <view class="card-title">🤖 机器人状态</view>
+        <view class="robot-summary">
+          <view class="summary-item">
+            <text class="summary-num val-green">{{overviewData.robots_summary.working}}</text>
+            <text class="summary-label">工作中</text>
+          </view>
+          <view class="summary-item">
+            <text class="summary-num val-orange">{{overviewData.robots_summary.charging}}</text>
+            <text class="summary-label">充电中</text>
+          </view>
+          <view class="summary-item">
+            <text class="summary-num val-cyan">{{overviewData.robots_summary.standby}}</text>
+            <text class="summary-label">待命</text>
+          </view>
+          <view class="summary-item">
+            <text class="summary-num">{{overviewData.robots_summary.total}}</text>
+            <text class="summary-label">总计</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 材料警告 -->
+      <view class="card" wx:if="{{overviewData.materials_alert.length > 0}}">
+        <view class="card-title" style="color:rgba(255,56,96,0.7)">⚠️ 材料警告</view>
+        <view wx:for="{{overviewData.materials_alert}}" wx:key="name" class="row">
+          <text class="row-label">{{item.icon}} {{item.name}}</text>
+          <view class="row-right">
+            <text class="row-value {{item.status==='empty'?'val-red':'val-orange'}}">库存 {{item.stock}}</text>
+            <view class="badge {{item.status==='empty'?'badge-critical':'badge-warn'}}">{{item.status}}</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 待审申请 -->
+      <view class="card">
+        <view class="card-title">📋 待审材料申请</view>
+        <view class="row">
+          <text class="row-label">待处理</text>
+          <text class="row-value val-orange">{{overviewData.pending_requests}} 条</text>
+        </view>
+        <button class="btn btn-purple btn-full" style="margin-top:16rpx" bindtap="switchTab" data-tab="request">前往处理 →</button>
+      </view>
+
+      <button class="btn btn-purple btn-full" bindtap="onRefresh">🔄 刷新</button>
+    </block>
+
+    <!-- ── 机器人 ── -->
+    <block wx:if="{{tab==='robots' && robotsData}}">
+      <view wx:for="{{robotsData.robots}}" wx:key="id" class="robot-card">
+        <view class="robot-header">
+          <text class="robot-icon">{{item.icon}}</text>
+          <view class="robot-info">
+            <view class="robot-name">{{item.name}}</view>
+            <view class="robot-id">ID: {{item.id}}</view>
+          </view>
+          <view class="badge {{item.status==='working'?'badge-ok':item.status==='charging'?'badge-warn':'badge-info'}}">
+            {{item.status}}
+          </view>
+        </view>
+        <view class="row">
+          <text class="row-label">当前任务</text>
+          <text class="row-value" style="font-size:26rpx">{{item.current_task}}</text>
+        </view>
+        <view class="row">
+          <text class="row-label">位置</text>
+          <text class="row-value" style="font-size:26rpx;color:#5a7a9a">📍 {{item.location}}</text>
+        </view>
+        <view class="row">
+          <text class="row-label">电量</text>
+          <view style="flex:1;margin-left:24rpx">
+            <view class="progress-bar" style="margin:0">
+              <view class="progress-fill {{item.battery_pct>50?'fill-cyan':item.battery_pct>20?'fill-orange':'fill-red'}}"
+                    style="width:{{item.battery_pct}}%"></view>
+            </view>
+          </view>
+          <text class="row-value {{item.battery_pct>50?'val-cyan':item.battery_pct>20?'val-orange':'val-red'}}" style="margin-left:16rpx">{{item.battery_pct}}%</text>
+        </view>
+        <view class="row">
+          <text class="row-label">累计汇报</text>
+          <text class="row-value val-purple">{{item.total_reports}} 次</text>
+        </view>
+      </view>
+      <button class="btn btn-purple btn-full" bindtap="onRefresh">🔄 刷新</button>
+    </block>
+
+    <!-- ── 进度 ── -->
+    <block wx:if="{{tab==='progress' && progressData}}">
+      <view class="card moon-card">
+        <view class="card-title moon-title">整体进度</view>
+        <view class="overall-pct">{{progressData.overall_progress_pct}}%</view>
+        <view class="progress-bar" style="height:14rpx">
+          <view class="progress-fill fill-purple" style="width:{{progressData.overall_progress_pct}}%"></view>
+        </view>
+        <view style="margin-top:12rpx;font-size:24rpx;color:#5a7a9a">{{progressData.phase}}</view>
+      </view>
+
+      <block wx:for="{{progressData.stagesList}}" wx:key="key">
+        <view class="stage-card">
+          <view class="stage-header">
+            <text class="stage-icon">{{item.icon}}</text>
+            <text class="stage-name">{{item.name}}</text>
+            <view class="badge {{item.status==='completed'?'badge-ok':item.status==='in_progress'?'badge-warn':'badge-info'}}">
+              {{item.status}}
+            </view>
+          </view>
+          <view class="progress-bar" style="margin:12rpx 0 8rpx">
+            <view class="progress-fill {{item.status==='completed'?'fill-cyan':'fill-purple'}}" style="width:{{item.progress_pct}}%"></view>
+          </view>
+          <view class="stage-pct">{{item.progress_pct}}%</view>
+          <view wx:if="{{item.note}}" class="stage-note">{{item.note}}</view>
+          <view wx:if="{{item.assigned_robots.length>0}}" class="stage-robots">
+            机器人：{{item.assigned_robots.join('、')}}
+          </view>
+        </view>
+      </block>
+
+      <button class="btn btn-purple btn-full" bindtap="onRefresh">🔄 刷新</button>
+    </block>
+
+    <!-- ── 材料 ── -->
+    <block wx:if="{{tab==='materials' && materialsData}}">
+      <view wx:if="{{materialsData.alerts.length>0}}" class="card alert-card">
+        <view class="card-title" style="color:rgba(255,56,96,0.7)">⚠️ 库存警告</view>
+        <view wx:for="{{materialsData.alerts}}" wx:key="material" class="row">
+          <text class="row-label">{{item.icon}} {{item.material}}</text>
+          <text class="row-value {{item.status==='empty'?'val-red':'val-orange'}}">{{item.warning}}</text>
+        </view>
+      </view>
+
+      <view class="card">
+        <view class="card-title">📦 材料库存</view>
+        <view wx:for="{{materialsData.inventoryList}}" wx:key="name" class="material-row">
+          <text class="mat-icon">{{item.icon}}</text>
+          <view class="mat-info">
+            <view class="mat-name">{{item.name}}</view>
+            <view class="progress-bar" style="margin:8rpx 0 4rpx">
+              <view class="progress-fill {{item.status==='ok'?'fill-cyan':item.status==='low'?'fill-orange':'fill-red'}}"
+                    style="width:{{item.capacity>0?item.stock/item.capacity*100:0}}%"></view>
+            </view>
+            <view class="mat-stock">{{item.stock}} / {{item.capacity}} {{item.unit}}</view>
+          </view>
+          <view class="badge {{item.status==='ok'?'badge-ok':item.status==='low'?'badge-warn':'badge-critical'}}">
+            {{item.status}}
+          </view>
+        </view>
+      </view>
+
+      <!-- 申请记录 -->
+      <view class="card">
+        <view class="card-title">📋 材料申请记录</view>
+        <view wx:for="{{materialsData.requests}}" wx:key="id" class="req-item">
+          <view class="req-header">
+            <text class="req-id">{{item.id}}</text>
+            <view class="badge {{item.status==='approved'?'badge-ok':item.status==='pending'?'badge-warn':'badge-critical'}}">
+              {{item.status}}
+            </view>
+          </view>
+          <view class="row">
+            <text class="row-label">机器人</text>
+            <text class="row-value val-purple">{{item.robot}}</text>
+          </view>
+          <view class="row">
+            <text class="row-label">材料</text>
+            <text class="row-value">{{item.material}} × {{item.amount}}</text>
+          </view>
+          <view class="req-reason">{{item.reason}}</view>
+        </view>
+      </view>
+
+      <button class="btn btn-purple btn-full" bindtap="onRefresh">🔄 刷新</button>
+    </block>
+
+    <!-- ── 操作面板 ── -->
+    <block wx:if="{{tab==='request'}}">
+
+      <!-- 汇报工程进度 -->
+      <view class="card moon-card">
+        <view class="card-title moon-title">📡 汇报工程进度</view>
+        <view class="form-row">
+          <text class="form-label">机器人</text>
+          <picker mode="selector" range="{{robotOptions}}" value="{{robotIndex}}" bindchange="onRobotChange">
+            <view class="picker-val">{{robotOptions[robotIndex]}} ▼</view>
+          </picker>
+        </view>
+        <view class="form-row">
+          <text class="form-label">建造阶段</text>
+          <picker mode="selector" range="{{stageOptions}}" value="{{stageIndex}}" bindchange="onStageChange">
+            <view class="picker-val">{{stageOptions[stageIndex]}} ▼</view>
+          </picker>
+        </view>
+        <input class="input-field" type="number" placeholder="进度 (0~100)" value="{{reportProgress}}" bindinput="onReportProgress" />
+        <input class="input-field" placeholder="备注说明（可选）" value="{{reportMsg}}" bindinput="onReportMsg" />
+        <button class="btn btn-purple btn-full" bindtap="submitReport">📤 提交汇报</button>
+      </view>
+
+      <!-- 申请材料 -->
+      <view class="card moon-card">
+        <view class="card-title moon-title">📦 申请建造材料</view>
+        <view class="form-row">
+          <text class="form-label">申请机器人</text>
+          <picker mode="selector" range="{{robotOptions}}" value="{{robotIndex}}" bindchange="onRobotChange">
+            <view class="picker-val">{{robotOptions[robotIndex]}} ▼</view>
+          </picker>
+        </view>
+        <input class="input-field" placeholder="材料名（如：气密板）" value="{{reqMaterial}}" bindinput="onReqMaterial" />
+        <input class="input-field" type="number" placeholder="数量" value="{{reqAmount}}" bindinput="onReqAmount" />
+        <input class="input-field" placeholder="申请原因（可选）" value="{{reqReason}}" bindinput="onReqReason" />
+        <button class="btn btn-orange btn-full" bindtap="submitRequest">📮 提交申请</button>
+      </view>
+
+      <!-- 地球批准补给 -->
+      <view class="card" style="border-color:rgba(0,200,255,0.2)">
+        <view class="card-title">🚀 地球批准补给</view>
+        <input class="input-field" placeholder="材料名" value="{{supplyMaterial}}" bindinput="onSupplyMaterial" />
+        <input class="input-field" type="number" placeholder="发送数量" value="{{supplyAmount}}" bindinput="onSupplyAmount" />
+        <button class="btn btn-cyan btn-full" bindtap="sendSupply">🚀 发射补给舱</button>
+      </view>
+
+    </block>
+
+  </view>
+</view>

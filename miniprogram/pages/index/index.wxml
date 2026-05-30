@@ -1,0 +1,48 @@
+<view class="container">
+  <view class="header">
+    <view class="title">资源接收站</view>
+    <view class="subtitle">欢迎，月球基地指挥官</view>
+  </view>
+
+  <!-- 月球基地状态 -->
+  <view class="card" wx:if="{{moonBase}}">
+    <view class="section-title">🌕 月球基地 LUNA-1</view>
+    <view class="stats-grid">
+      <view class="stat-item">
+        <view class="stat-value">{{moonBase.overall_progress}}%</view>
+        <view class="stat-label">总进度</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value">{{moonBase.active_robots}}</view>
+        <view class="stat-label">在线机器人</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value">{{moonBase.phase}}</view>
+        <view class="stat-label">当前阶段</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 材料库存（API 真实数据） -->
+  <view class="card">
+    <view class="section-title">当前资源概览</view>
+    <view wx:if="{{loading}}" class="loading-text">加载中...</view>
+    <view wx:else>
+      <view class="resource-list">
+        <view class="resource-item" wx:for="{{inventoryList}}" wx:key="name">
+          <text class="resource-name">{{item.name}}</text>
+          <view class="resource-right">
+            <text class="resource-amount {{item.current < item.minimum ? 'warn' : ''}}">{{item.current}}</text>
+            <text class="resource-unit">/{{item.capacity}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="action-area">
+    <button class="btn-primary" bindtap="receiveResources">接收新资源</button>
+    <button class="btn-secondary" bindtap="goToRoom">选择建设房间</button>
+    <button class="btn-earth" bindtap="goToEarth">🌍 地球指挥中心</button>
+  </view>
+</view>

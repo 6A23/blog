@@ -1,0 +1,108 @@
+.header {
+  margin-bottom: 40rpx;
+  color: #C0C0C0;
+}
+
+.subtitle {
+  font-size: 24rpx;
+  color: #888;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 30rpx;
+  color: #C0C0C0;
+  border-left: 8rpx solid #C0C0C0;
+  padding-left: 20rpx;
+}
+
+.stats-grid {
+  display: flex;
+  justify-content: space-around;
+  background-color: #002244;
+  padding: 20rpx;
+  border-radius: 12rpx;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #C0C0C0;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #888;
+  margin-top: 10rpx;
+}
+
+.loading-text {
+  text-align: center;
+  color: #888;
+  font-size: 28rpx;
+  padding: 30rpx 0;
+}
+
+.resource-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.resource-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #002244;
+}
+
+.resource-item:last-child {
+  border-bottom: none;
+}
+
+.resource-name {
+  font-size: 28rpx;
+  color: #C0C0C0;
+}
+
+.resource-right {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+}
+
+.resource-amount {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #C0C0C0;
+}
+
+.resource-amount.warn {
+  color: #ff4444;
+}
+
+.resource-unit {
+  font-size: 22rpx;
+  color: #666;
+}
+
+.action-area {
+  margin-top: 60rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+}
+
+.btn-earth {
+  background-color: #003366;
+  color: #6af;
+  border: 1rpx solid #6af;
+  border-radius: 50rpx;
+  font-size: 30rpx;
+  padding: 20rpx 0;
+}

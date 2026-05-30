@@ -1,0 +1,220 @@
+<view class="container">
+
+
+
+  <!-- 顶部模块导航 -->
+  <view class="module-nav">
+    <view class="module-title">地球指挥中心</view>
+    <view class="module-subtitle">按模块快速查看指挥数据</view>
+    <view class="module-grid">
+      <view class="module-item {{tab==='moon'?'active':''}}" bindtap="switchTab" data-tab="moon">
+        <text class="module-icon">🌕</text>
+        <view class="module-info">
+          <text class="module-name">月球基地</text>
+          <text class="module-desc">进度 / 材料</text>
+        </view>
+      </view>
+      <view class="module-item {{tab==='robots'?'active':''}}" bindtap="switchTab" data-tab="robots">
+        <text class="module-icon">🤖</text>
+        <view class="module-info">
+          <text class="module-name">机器人队列</text>
+          <text class="module-desc">ID / 状态</text>
+        </view>
+      </view>
+      <view class="module-item {{tab==='status'?'active':''}}" bindtap="switchTab" data-tab="status">
+        <text class="module-icon">🌏</text>
+        <view class="module-info">
+          <text class="module-name">地球状态</text>
+          <text class="module-desc">环境 / 数据</text>
+        </view>
+      </view>
+      <view class="module-item {{tab==='events'?'active':''}}" bindtap="switchTab" data-tab="events">
+        <text class="module-icon">📋</text>
+        <view class="module-info">
+          <text class="module-name">事件日志</text>
+          <text class="module-desc">告警 / 记录</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>连接指挥中心...</text>
+  </view>
+
+  <view wx:if="{{!loading}}" class="content-area">
+
+    <!-- 月球总览 -->
+    <block wx:if="{{tab==='moon' && moonData}}">
+      <view class="card">
+        <view class="section-title">🌕 {{moonData.base.name}}</view>
+        <view class="info-row">
+          <text class="info-label">阶段</text>
+          <text class="info-val purple">{{moonData.base.phase}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">总进度</text>
+          <text class="info-val purple">{{moonData.base.overall_progress_pct}}%</text>
+        </view>
+        <view class="progress-wrap">
+          <view class="prog-bar"><view class="prog-fill purple" style="width:{{moonData.base.overall_progress_pct}}%"></view></view>
+        </view>
+        <view class="robot-summary">
+          <view class="rs-item">
+            <text class="rs-val green">{{moonData.robots_summary.working}}</text>
+            <text class="rs-lbl">工作中</text>
+          </view>
+          <view class="rs-item">
+            <text class="rs-val orange">{{moonData.robots_summary.charging}}</text>
+            <text class="rs-lbl">充电</text>
+          </view>
+          <view class="rs-item">
+            <text class="rs-val">{{moonData.robots_summary.standby}}</text>
+            <text class="rs-lbl">待命</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 材料警告 -->
+      <view class="card warn-card" wx:if="{{moonData.materials_alert.length > 0}}">
+        <view class="section-title" style="border-color:#ff6b6b;color:#ff6b6b">⚠️ 材料警告</view>
+        <view class="info-row" wx:for="{{moonData.materials_alert}}" wx:key="name">
+          <text class="info-label">{{item.icon}} {{item.name}}</text>
+          <view class="badge badge-{{item.status}}">{{item.status}}</view>
+        </view>
+      </view>
+
+      <button class="btn-secondary refresh" bindtap="onRefresh">🔄 刷新</button>
+    </block>
+
+    <!-- 机器人列表 -->
+    <block wx:if="{{tab==='robots' && robotsData}}">
+      <!-- 汇总栏 -->
+      <view class="robot-summary-bar">
+        <view class="rsb-item">
+          <text class="rsb-val">{{robotsData.total}}</text>
+          <text class="rsb-lbl">总数</text>
+        </view>
+        <view class="rsb-divider"></view>
+        <view class="rsb-item">
+          <text class="rsb-val green">{{robotsData.count_working}}</text>
+          <text class="rsb-lbl">工作中</text>
+        </view>
+        <view class="rsb-divider"></view>
+        <view class="rsb-item">
+          <text class="rsb-val orange">{{robotsData.count_charging}}</text>
+          <text class="rsb-lbl">充电中</text>
+        </view>
+        <view class="rsb-divider"></view>
+        <view class="rsb-item">
+          <text class="rsb-val">{{robotsData.count_standby}}</text>
+          <text class="rsb-lbl">待命</text>
+        </view>
+      </view>
+
+      <!-- 机器人卡片列表 -->
+      <view class="robot-card" wx:for="{{robotsData.robots}}" wx:key="id">
+        <!-- 头部：ID 徽章 + 名称 + 状态标签 -->
+        <view class="robot-head">
+          <view class="robot-id-badge">{{item.id}}</view>
+          <view class="robot-meta">
+            <view class="robot-name">{{item.icon}} {{item.name}}</view>
+            <view class="robot-task">📍 {{item.current_task}}</view>
+          </view>
+          <view class="status-tag status-{{item.status}}">
+            {{item.status === 'working' ? '工作中' : item.status === 'charging' ? '充电中' : '待命'}}
+          </view>
+        </view>
+
+        <!-- 电量进度条 -->
+        <view class="batt-row">
+          <text class="info-label">⚡ 电量</text>
+          <view class="batt-wrap">
+            <view class="prog-bar">
+              <view class="prog-fill {{item.battery_pct>50?'cyan':item.battery_pct>20?'orange':'red'}}"
+                    style="width:{{item.battery_pct}}%"></view>
+            </view>
+            <text class="batt-pct {{item.battery_pct<=20?'red-text':''}}">{{item.battery_pct}}%</text>
+          </view>
+        </view>
+
+        <!-- 详细信息 -->
+        <view class="robot-detail-grid">
+          <view class="detail-item">
+            <text class="detail-label">当前阶段</text>
+            <text class="detail-val purple">{{item.current_stage || '—'}}</text>
+          </view>
+          <view class="detail-item">
+            <text class="detail-label">位置</text>
+            <text class="detail-val">{{item.location}}</text>
+          </view>
+          <view class="detail-item">
+            <text class="detail-label">累计汇报</text>
+            <text class="detail-val cyan">{{item.total_reports}} 次</text>
+          </view>
+          <view class="detail-item">
+            <text class="detail-label">最后汇报</text>
+            <text class="detail-val">{{item.last_report || '暂无'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <button class="btn-secondary refresh" bindtap="onRefresh">🔄 刷新</button>
+    </block>
+
+    <!-- 地球状态 -->
+    <block wx:if="{{tab==='status' && statusData}}">
+      <view class="card">
+        <view class="section-title">🌏 地球实时状态</view>
+        <view class="info-row">
+          <text class="info-label">全球人口</text>
+          <text class="info-val cyan">{{statusData.data.population_display}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">CO₂ 浓度</text>
+          <text class="info-val orange">{{statusData.data.co2_ppm}} ppm</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">地表温度</text>
+          <text class="info-val">{{statusData.data.surface_temp_c}} °C</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">海平面上升</text>
+          <text class="info-val orange">{{statusData.data.sea_level_rise_mm}} mm/年</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">活跃火山</text>
+          <text class="info-val">{{statusData.data.active_volcanoes}} 座</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">月地距离</text>
+          <text class="info-val purple">{{statusData.data.moon_distance_km}} km</text>
+        </view>
+      </view>
+      <button class="btn-secondary refresh" bindtap="onRefresh">🔄 刷新</button>
+    </block>
+
+    <!-- 事件日志 -->
+    <block wx:if="{{tab==='events' && eventsData}}">
+      <view class="card">
+        <view class="section-title">📋 事件日志（{{eventsData.total}} 条）</view>
+        <view class="event-item" wx:for="{{eventsData.events}}" wx:key="time">
+          <text class="ev-icon">{{item.icon}}</text>
+          <view class="ev-body">
+            <view class="ev-msg">{{item.msg}}</view>
+            <view class="ev-time">{{item.time}}</view>
+          </view>
+          <view class="badge badge-{{item.level==='CRITICAL'?'empty':item.level==='WARN'?'low':'ok'}}">
+            {{item.level}}
+          </view>
+        </view>
+      </view>
+      <button class="btn-secondary refresh" bindtap="onRefresh">🔄 刷新</button>
+    </block>
+
+  </view>
+
+
+</view>
+

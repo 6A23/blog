@@ -1,0 +1,148 @@
+.container { min-height: 100vh; }
+.content   { padding: 24rpx; padding-bottom: 140rpx; }
+
+/* Tab 滚动 */
+.tab-bar-scroll { width: 100%; }
+.moon-tabs {
+  display: flex;
+  flex-direction: row;
+  white-space: nowrap;
+  padding: 0 16rpx;
+  background: #0b1628;
+  border-bottom: 1rpx solid rgba(180,127,255,0.12);
+}
+.moon-tabs .tab-item { padding: 20rpx 24rpx; }
+
+/* 月球主题 */
+.moon-card  { border-color: rgba(180,127,255,0.2); }
+.moon-title { color: rgba(180,127,255,0.7); }
+
+/* 总体进度大字 */
+.overall-pct {
+  font-size: 80rpx;
+  font-weight: 900;
+  color: #b47fff;
+  line-height: 1;
+  margin: 10rpx 0 16rpx;
+  text-shadow: 0 0 20rpx rgba(180,127,255,0.4);
+}
+
+/* 机器人摘要 */
+.robot-summary {
+  display: flex;
+  justify-content: space-around;
+  padding: 10rpx 0;
+}
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+}
+.summary-num   { font-size: 48rpx; font-weight: 900; line-height: 1; }
+.summary-label { font-size: 22rpx; color: #5a7a9a; }
+
+/* 机器人卡 */
+.robot-card {
+  background: #0b1628;
+  border: 1rpx solid rgba(180,127,255,0.15);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+.robot-header {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+.robot-icon { font-size: 48rpx; flex-shrink: 0; }
+.robot-info { flex: 1; }
+.robot-name { font-size: 30rpx; font-weight: 600; color: #c8e6ff; }
+.robot-id   { font-size: 22rpx; color: #5a7a9a; margin-top: 4rpx; }
+.fill-orange{ background: #ffb347; }
+.fill-red   { background: #ff3860; }
+
+/* 进度阶段卡 */
+.stage-card {
+  background: #0b1628;
+  border: 1rpx solid rgba(180,127,255,0.15);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+.stage-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 8rpx;
+}
+.stage-icon { font-size: 36rpx; }
+.stage-name { flex: 1; font-size: 30rpx; font-weight: 600; }
+.stage-pct  { font-size: 28rpx; font-weight: 700; color: #b47fff; }
+.stage-note {
+  font-size: 24rpx;
+  color: #5a7a9a;
+  margin-top: 8rpx;
+}
+.stage-robots {
+  font-size: 24rpx;
+  color: rgba(180,127,255,0.6);
+  margin-top: 6rpx;
+}
+
+/* 材料行 */
+.material-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid rgba(0,200,255,0.06);
+}
+.material-row:last-child { border-bottom: none; }
+.mat-icon   { font-size: 40rpx; flex-shrink: 0; }
+.mat-info   { flex: 1; }
+.mat-name   { font-size: 28rpx; font-weight: 600; color: #c8e6ff; }
+.mat-stock  { font-size: 22rpx; color: #5a7a9a; }
+
+/* 申请记录 */
+.req-item {
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid rgba(0,200,255,0.06);
+}
+.req-item:last-child { border-bottom: none; }
+.req-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+.req-id     { font-size: 24rpx; color: #5a7a9a; font-weight: 600; }
+.req-reason { font-size: 24rpx; color: #5a7a9a; margin-top: 8rpx; }
+
+/* 警告卡 */
+.alert-card { border-color: rgba(255,56,96,0.2); }
+
+/* 表单 */
+.form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+.form-label { font-size: 28rpx; color: #5a7a9a; }
+.picker-val {
+  background: rgba(180,127,255,0.1);
+  border: 1rpx solid rgba(180,127,255,0.3);
+  border-radius: 10rpx;
+  padding: 10rpx 20rpx;
+  font-size: 28rpx;
+  color: #b47fff;
+}
+
+/* 行右侧双元素 */
+.row-right {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}

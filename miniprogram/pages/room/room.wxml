@@ -1,0 +1,38 @@
+<view class="container">
+  <view class="header">
+    <view class="title">建设规划</view>
+    <view class="subtitle">选择您要建设的房间类型</view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">预设房间类型</view>
+    <view class="room-grid">
+      <view 
+        class="room-item {{selectedRoom === item.type ? 'active' : ''}}" 
+        wx:for="{{roomTypes}}" 
+        wx:key="type"
+        bindtap="selectRoom"
+        data-type="{{item.type}}"
+      >
+        <view class="room-icon">{{item.icon}}</view>
+        <view class="room-name">{{item.type}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">自定义房间</view>
+    <input 
+      class="custom-input" 
+      placeholder="输入房间名称" 
+      placeholder-class="placeholder" 
+      bindinput="onInputCustom"
+      value="{{customRoom}}"
+    />
+    <button class="btn-secondary" bindtap="selectCustomRoom">选择自定义房间</button>
+  </view>
+
+  <view class="action-area">
+    <button class="btn-primary" bindtap="startConstruction" disabled="{{!selectedRoom}}">开始建设</button>
+  </view>
+</view>

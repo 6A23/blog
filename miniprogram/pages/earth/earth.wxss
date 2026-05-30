@@ -1,0 +1,208 @@
+/* 顶部模块导航 */
+.content-area { padding-bottom: 30rpx; }
+.module-nav {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: rgba(0, 31, 63, 0.98);
+  padding: 20rpx 20rpx 18rpx;
+  border-bottom: 1rpx solid rgba(192,192,192,0.12);
+  box-shadow: 0 6rpx 22rpx rgba(0,0,0,0.35);
+}
+.module-title {
+  font-size: 34rpx;
+  font-weight: 900;
+  color: #C0C0C0;
+}
+.module-subtitle {
+  font-size: 22rpx;
+  color: #888;
+  margin: 6rpx 0 18rpx;
+}
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14rpx;
+}
+.module-item {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  background: #002244;
+  border: 1rpx solid rgba(192,192,192,0.12);
+  border-radius: 16rpx;
+  padding: 16rpx;
+  color: #888;
+}
+.module-item.active {
+  background: #003b72;
+  border-color: #4fc3f7;
+  box-shadow: 0 0 18rpx rgba(79,195,247,0.25);
+}
+.module-icon { font-size: 38rpx; flex-shrink: 0; }
+.module-info { display: flex; flex-direction: column; gap: 4rpx; }
+.module-name { font-size: 26rpx; font-weight: 700; color: #C0C0C0; }
+.module-desc { font-size: 20rpx; color: #888; }
+.module-item.active .module-desc { color: #9bdcff; }
+
+
+
+/* 通用 */
+.loading { padding: 80rpx; text-align: center; color: #888; font-size: 28rpx; }
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  margin-bottom: 24rpx;
+  color: #C0C0C0;
+  border-left: 8rpx solid #C0C0C0;
+  padding-left: 18rpx;
+}
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid rgba(192,192,192,0.06);
+}
+.info-row:last-child { border-bottom: none; }
+.info-label { font-size: 26rpx; color: #888; }
+.info-val   { font-size: 28rpx; color: #C0C0C0; font-weight: 600; }
+.info-val.purple { color: #b47fff; }
+.info-val.cyan   { color: #4fc3f7; }
+.info-val.orange { color: #ffb347; }
+.info-val.green  { color: #00ff88; }
+
+/* 进度条 */
+.progress-wrap { margin: 12rpx 0 20rpx; }
+.prog-bar {
+  height: 10rpx;
+  background: #002244;
+  border-radius: 5rpx;
+  overflow: hidden;
+}
+.prog-fill { height: 100%; border-radius: 5rpx; transition: width 0.4s; }
+.prog-fill.purple { background: linear-gradient(90deg, #b47fff, #7b4fff); }
+.prog-fill.cyan   { background: linear-gradient(90deg, #4fc3f7, #00ff88); }
+.prog-fill.orange { background: #ffb347; }
+.prog-fill.red    { background: #ff6b6b; }
+
+/* 机器人摘要 */
+.robot-summary {
+  display: flex;
+  justify-content: space-around;
+  background: #002244;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-top: 16rpx;
+}
+.rs-item { display: flex; flex-direction: column; align-items: center; gap: 4rpx; }
+.rs-val  { font-size: 44rpx; font-weight: 900; color: #C0C0C0; }
+.rs-val.green  { color: #00ff88; }
+.rs-val.orange { color: #ffb347; }
+.rs-lbl  { font-size: 22rpx; color: #888; }
+
+/* 机器人汇总栏 */
+.robot-summary-bar {
+  display: flex;
+  align-items: center;
+  background: #002244;
+  border-radius: 16rpx;
+  padding: 24rpx 0;
+  margin-bottom: 24rpx;
+}
+.rsb-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6rpx; }
+.rsb-val  { font-size: 44rpx; font-weight: 900; color: #C0C0C0; }
+.rsb-val.green  { color: #00ff88; }
+.rsb-val.orange { color: #ffb347; }
+.rsb-lbl  { font-size: 22rpx; color: #888; }
+.rsb-divider { width: 1rpx; height: 60rpx; background: rgba(192,192,192,0.15); }
+
+/* 机器人卡 */
+.robot-card {
+  background: #003366;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.5);
+}
+.robot-head {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+/* ID 徽章 */
+.robot-id-badge {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6a5acd, #4fc3f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 900;
+  color: #fff;
+  flex-shrink: 0;
+}
+.robot-meta { flex: 1; min-width: 0; }
+.robot-name { font-size: 28rpx; font-weight: 600; color: #C0C0C0; }
+.robot-task { font-size: 22rpx; color: #888; margin-top: 6rpx; }
+
+/* 状态标签 */
+.status-tag {
+  font-size: 22rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  flex-shrink: 0;
+}
+.status-working  { background: rgba(0,255,136,0.15); color: #00ff88; border: 1rpx solid #00ff88; }
+.status-charging { background: rgba(255,179,71,0.15); color: #ffb347; border: 1rpx solid #ffb347; }
+.status-standby  { background: rgba(192,192,192,0.1); color: #888;    border: 1rpx solid #555; }
+
+/* 电量行 */
+.batt-row { display: flex; align-items: center; gap: 16rpx; margin-bottom: 16rpx; }
+.batt-wrap { display: flex; align-items: center; gap: 10rpx; flex: 1; }
+.batt-pct  { font-size: 24rpx; color: #888; width: 70rpx; text-align: right; }
+.batt-pct.red-text { color: #ff6b6b; }
+
+/* 机器人详情格 */
+.robot-detail-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  background: #002244;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+.detail-item {
+  width: 50%;
+  padding: 16rpx 20rpx;
+  box-sizing: border-box;
+  border-bottom: 1rpx solid rgba(192,192,192,0.06);
+}
+.detail-item:nth-child(odd) { border-right: 1rpx solid rgba(192,192,192,0.06); }
+.detail-label { font-size: 20rpx; color: #666; margin-bottom: 6rpx; }
+.detail-val   { font-size: 24rpx; color: #C0C0C0; word-break: break-all; }
+.detail-val.purple { color: #b47fff; }
+.detail-val.cyan   { color: #4fc3f7; }
+
+/* 事件 */
+.event-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14rpx;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid rgba(192,192,192,0.06);
+}
+.event-item:last-child { border-bottom: none; }
+.ev-icon { font-size: 34rpx; flex-shrink: 0; margin-top: 2rpx; }
+.ev-body { flex: 1; }
+.ev-msg  { font-size: 26rpx; line-height: 1.5; color: #C0C0C0; }
+.ev-time { font-size: 22rpx; color: #888; margin-top: 4rpx; }
+
+/* 警告卡 */
+.warn-card { border: 1rpx solid rgba(255,107,107,0.3); }
+
+/* 刷新按钮 */
+.refresh { margin: 10rpx 0 40rpx; }
