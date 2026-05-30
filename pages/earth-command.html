@@ -1460,8 +1460,13 @@
     async function loadRobots() {
       const data = await callAPI(API_BASE + '?query=moon_robots', '机器人状态');
       if (!data || data.code !== 200) return;
+      const robotGrid = document.getElementById('robotGrid');
+      if (!data.robots.length) {
+        robotGrid.innerHTML = '<div style="color:var(--text-dim);font-size:0.82rem;padding:20px;text-align:center">暂无真实机器人上报数据</div>';
+        return;
+      }
       const statusColor = { working: '#00ff88', charging: '#ffd93d', standby: '#5a7a9a' };
-      document.getElementById('robotGrid').innerHTML = data.robots.map(r => {
+      robotGrid.innerHTML = data.robots.map(r => {
         const bColor = r.battery_pct > 50 ? '#00ff88' : r.battery_pct > 20 ? '#ffb347' : '#ff3860';
         return `
         <div class="robot-card">

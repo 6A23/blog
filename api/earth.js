@@ -218,69 +218,8 @@ const buildingStages = {
   },
 };
 
-// 机器人列表
-const moonRobots = {
-  'R1': {
-    id: 'R1',
-    name: '建造机器人 阿波罗-1',
-    icon: '🤖',
-    status: 'working',
-    current_task: '居住舱气密封板焊接',
-    current_stage: '居住舱',
-    battery_pct: 88,
-    location: '居住舱 A 区',
-    total_reports: 14,
-    last_report: null,
-  },
-  'R2': {
-    id: 'R2',
-    name: '建造机器人 阿波罗-2',
-    icon: '🤖',
-    status: 'working',
-    current_task: '太阳能板支架固定',
-    current_stage: '能源系统',
-    battery_pct: 72,
-    location: '基地东侧能源区',
-    total_reports: 11,
-    last_report: null,
-  },
-  'R3': {
-    id: 'R3',
-    name: '建造机器人 阿波罗-3',
-    icon: '🤖',
-    status: 'charging',
-    current_task: '充电待命',
-    current_stage: null,
-    battery_pct: 31,
-    location: '充电站 C2',
-    total_reports: 9,
-    last_report: null,
-  },
-  'R4': {
-    id: 'R4',
-    name: '建造机器人 阿波罗-4',
-    icon: '🤖',
-    status: 'working',
-    current_task: '居住舱内壁隔热层铺设',
-    current_stage: '居住舱',
-    battery_pct: 95,
-    location: '居住舱 B 区',
-    total_reports: 7,
-    last_report: null,
-  },
-  'R5': {
-    id: 'R5',
-    name: '建造机器人 阿波罗-5',
-    icon: '🤖',
-    status: 'standby',
-    current_task: '等待材料补给',
-    current_stage: '居住舱',
-    battery_pct: 100,
-    location: '物资仓库',
-    total_reports: 5,
-    last_report: null,
-  },
-};
+// 机器人列表：初始为空，等待真实小程序/机器人端上报注册
+const moonRobots = {};
 
 // 月球材料库存
 const moonMaterials = {
