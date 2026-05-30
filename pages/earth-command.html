@@ -92,6 +92,68 @@
       padding: 90px 24px 60px;
     }
 
+    /* ── 顶部模块导航 ── */
+    .command-nav {
+      position: sticky;
+      top: 58px;
+      z-index: 90;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      padding: 12px;
+      margin-bottom: 26px;
+      background: rgba(6, 13, 26, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+    }
+
+    .command-nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      color: var(--text);
+      text-decoration: none;
+      background: rgba(0, 200, 255, 0.05);
+      border: 1px solid rgba(0, 200, 255, 0.12);
+      border-radius: 10px;
+      transition: all 0.2s;
+    }
+
+    .command-nav a:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 200, 255, 0.38);
+      box-shadow: var(--glow);
+    }
+
+    .nav-module-icon { font-size: 1.35rem; }
+    .nav-module-name { display:block; font-weight:700; font-size:0.86rem; }
+    .nav-module-desc { display:block; color:var(--text-dim); font-size:0.68rem; margin-top:2px; }
+
+    .module-heading {
+      scroll-margin-top: 150px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 30px 0 16px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--cyan);
+      letter-spacing: 3px;
+      text-shadow: var(--glow);
+    }
+
+    .module-heading::before,
+    .module-heading::after {
+      content: '';
+      height: 1px;
+      flex: 1;
+      background: linear-gradient(90deg, transparent, rgba(0,200,255,0.35), transparent);
+    }
+
+    .module-heading span { white-space: nowrap; font-size: 0.86rem; }
+
     /* ── 页头 ── */
     .ecc-header {
       text-align: center;
@@ -869,6 +931,28 @@
       <p class="sub">GLOBAL THREAT MONITORING · FACILITY CONTROL · LUNAR BASE COMMAND</p>
     </div>
 
+    <!-- 顶部模块导航 -->
+    <div class="command-nav">
+      <a href="#earth-status">
+        <span class="nav-module-icon">🌏</span>
+        <span><span class="nav-module-name">地球态势</span><span class="nav-module-desc">威胁等级 / 环境状态 / 事件</span></span>
+      </a>
+      <a href="#facility-control">
+        <span class="nav-module-icon">🛰️</span>
+        <span><span class="nav-module-name">设施控制</span><span class="nav-module-desc">卫星 / 防御 / 发射终止</span></span>
+      </a>
+      <a href="#lunar-command">
+        <span class="nav-module-icon">🌕</span>
+        <span><span class="nav-module-name">月球基地</span><span class="nav-module-desc">机器人 / 工程 / 材料补给</span></span>
+      </a>
+      <a href="#api-docs">
+        <span class="nav-module-icon">🔌</span>
+        <span><span class="nav-module-name">API 接口</span><span class="nav-module-desc">接口文档 / 响应预览</span></span>
+      </a>
+    </div>
+
+    <div id="earth-status" class="module-heading"><span>🌏 地球态势模块</span></div>
+
     <!-- 威胁等级横幅 -->
     <div class="threat-banner" id="threatBanner">
       <div class="threat-left">
@@ -926,6 +1010,8 @@
 
     </div>
 
+    <div id="facility-control" class="module-heading"><span>🛰️ 全球设施控制模块</span></div>
+
     <!-- 设施控制 -->
     <div class="panel full-panel">
       <div class="panel-header">
@@ -944,7 +1030,7 @@
 
     <!-- ══════════════════════════════════════════════ -->
     <!-- 🌕 月球基地模块分隔 -->
-    <div class="section-divider">
+    <div id="lunar-command" class="section-divider" style="scroll-margin-top:150px">
       <div class="section-divider-line"></div>
       <span class="section-divider-label">🌕 LUNAR BASE COMMAND — LUNA-1</span>
       <div class="section-divider-line"></div>
@@ -1105,6 +1191,9 @@
 
       </div>
     </div>
+
+
+    <div id="api-docs" class="module-heading"><span>🔌 API 接口模块</span></div>
 
     <!-- API 接口文档 -->
     <div class="panel full-panel api-panel">
