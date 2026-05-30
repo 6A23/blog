@@ -305,6 +305,7 @@ export default function handler(req, res) {
         moon_robots:     '/api/earth?query=moon_robots',
         moon_progress:   '/api/earth?query=moon_progress',
         moon_materials:  '/api/earth?query=moon_materials',
+        robot_update:    '/api/earth?action=robot_update&robot=R1&status=working&battery=88&location=居住舱A区&task=气密焊接',
         moon_report:     '/api/earth?action=moon_report&robot=R1&stage=居住舱&progress=65&msg=气密焊接完成',
         moon_request:    '/api/earth?action=moon_request&robot=R1&material=气密板&amount=20&reason=B区封闭需要',
         moon_supply:     '/api/earth?action=moon_supply&material=气密板&amount=20',
@@ -550,6 +551,75 @@ export default function handler(req, res) {
   // ════════════════════════════════════════════
   // 🌕 月球机器人建造系统 — 操作路由
   // ════════════════════════════════════════════
+
+  // ── action=robot_update：机器人上报真实状态/电量/位置/任务 ──
+  if (action === 'robot_update') {
+    if (!robot) {
+      return res.status(400).json({
+        code: 400,
+        message: 'robot 参数不能为空，例如：&robot=R1',
+      });
+    }
+
+    const allowedStatus = ['working', 'charging', 'standby', 'offline', 'error'];
+    if (status && !allowedStatus.includes(status)) {
+      return res.status(400).json({
+        code: 400,
+        message: `status 参数无效，可用：${allowedStatus.join(', ')}`,
+      });
+    }
+
+    let batteryPct = null;
+    if (battery !== undefined) {
+      batteryPct = parseInt(battery, 10);
+      if (isNaN(batteryPct) || batteryPct < 0 || batteryPct > 100) {
+        return res.status(400).json({
+          code: 400,
+          message: 'battery 参数必须是 0~100 的整数',
+        });
+      }
+    }
+
+    const existed = !!moonRobots[robot];
+    const current = moonRobots[robot] || {
+      id: robot,
+      name: name || `月球机器人 ${robot}`,
+      icon: '🤖',
+      status: 'standby',
+      current_task: '等待真实状态上报',
+      current_stage: null,
+      battery_pct: 0,
+      location: '未知位置',
+      total_reports: 0,
+      last_report: null,
+    };
+
+    current.name = name || current.name;
+    current.status = status || current.status;
+    current.current_task = task || current.current_task;
+    current.location = location || current.location;
+    current.battery_pct = batteryPct === null ? current.battery_pct : batteryPct;
+    current.last_report = now();
+    current.total_reports = (current.total_reports || 0) + 1;
+    moonRobots[robot] = current;
+
+    eventLog.unshift({
+      time: now(),
+      level: current.status === 'error' || current.status === 'offline' ? 'WARN' : 'INFO',
+      icon: '🤖',
+      msg: `[机器人状态] ${current.name}（${robot}）${existed ? '更新' : '注册'}：${current.status} · 电量 ${current.battery_pct}% · ${current.location} · ${current.current_task}`,
+    });
+
+    return res.status(200).json({
+      code: 200,
+      action: 'robot_update',
+      success: true,
+      created: !existed,
+      robot: current,
+      message: `✅ ${current.name} 状态已${existed ? '更新' : '注册'}：${current.status}，电量 ${current.battery_pct}%`,
+      timestamp: now(),
+    });
+  }
 
   // ── action=moon_report：机器人汇报工程进度 ──
   if (action === 'moon_report') {
