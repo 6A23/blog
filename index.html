@@ -109,7 +109,6 @@
           <button id="jumpBtn" class="secondary-btn" disabled>跳跃躲避</button>
           <button id="skillBtn" class="secondary-btn" disabled>蓄能炮</button>
           <button id="medkitBtn" class="secondary-btn" disabled>使用治疗包</button>
-
         </div>
         <ol id="battleLog" class="battle-log"></ol>
       </article>
@@ -131,36 +130,6 @@
   </section>
 
   <script src="game.js"></script>
-  <script>
-    // 强制测试 Canvas 渲染
-    setTimeout(function() {
-      var c = document.getElementById('gameCanvas');
-      if (!c) { console.error('NO CANVAS'); return; }
-      console.log('Canvas exists:', c.width, 'x', c.height);
-      console.log('ctx exists:', !!c.getContext('2d'));
-      console.log('typeof drawGame:', typeof drawGame);
-      console.log('typeof gameLoop:', typeof gameLoop);
-      console.log('typeof state:', typeof state);
-      
-      // 强制画背景
-      if (typeof drawGame === 'function') {
-        console.log('Calling drawGame manually...');
-        drawGame();
-      } else {
-        console.log('drawGame not found, drawing manually...');
-        var ctx = c.getContext('2d');
-        ctx.fillStyle = '#1e3a5f';
-        ctx.fillRect(0, 0, c.width, c.height);
-        for (var i = 0; i < 50; i++) {
-          ctx.fillStyle = 'rgba(255,255,255,0.7)';
-          ctx.fillRect(Math.random() * c.width, Math.random() * c.height * 0.6, 2, 2);
-        }
-        ctx.fillStyle = 'white';
-        ctx.font = '20px Arial';
-        ctx.fillText('手动绘制 - 背景测试', 50, 200);
-      }
-    }, 500);
-  </script>
 
 </body>
 </html>

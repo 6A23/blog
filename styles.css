@@ -119,8 +119,7 @@ h1 {
 
 .arena-card canvas {
   display: block;
-  width: 100%;
-  max-width: 900px;
+  max-width: 100%;
   height: auto;
   border-radius: 12px;
 }
@@ -544,6 +543,83 @@ h1 {
 .leaderboard-table .speed-cell {
   color: var(--good);
   font-size: 1.05rem;
+}
+
+/* --- Medals Grid --- */
+.medals-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.medal-item {
+  padding: 14px 10px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  text-align: center;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.medal-item.unlocked {
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.15), rgba(110, 231, 255, 0.12));
+  box-shadow: 0 0 16px rgba(250, 204, 21, 0.15);
+}
+
+.medal-icon {
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 6px;
+}
+
+.medal-name {
+  display: block;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.medal-desc {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+/* --- Enemy Status --- */
+.enemy-status {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+
+.enemy-status > div:last-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.enemy-status h2 {
+  margin: 0 0 8px;
+}
+
+/* --- Keyboard Tip --- */
+.keyboard-tip {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(110, 231, 255, 0.08);
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+/* --- Stage Clear Medal --- */
+.stage-clear-medal {
+  color: var(--gold);
+  font-weight: 900;
+  font-size: 1.1rem;
 }
 
 @media (max-width: 900px) {

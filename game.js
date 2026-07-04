@@ -177,7 +177,10 @@ const els = {
   stageClearConfetti: $('stageClearConfetti'),
   stageClearIcon: $('stageClearIcon'),
   stageClearTitle: $('stageClearTitle'),
-  stageClearUpgrade: $('stageClearUpgrade')
+  stageClearUpgrade: $('stageClearUpgrade'),
+  stageClearMedal: $('stageClearMedal'),
+  medalCount: $('medalCount'),
+  medalsGrid: $('medalsGrid')
 };
 
 
