@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>测试页面</title>
+  <style>
+    body { background: #0a0a2e; color: #fff; font-family: sans-serif; padding: 40px; }
+    .test { padding: 20px; margin: 10px 0; border: 2px solid #4fc3f7; border-radius: 8px; }
+    canvas { border: 2px solid #ff5722; background: #000; }
+  </style>
+</head>
+<body>
+  <h1>JS 执行测试</h1>
+  <div id="status" class="test">等待 JavaScript 执行...</div>
+  <div id="canvas-test" class="test">
+    <canvas id="testCanvas" width="400" height="200"></canvas>
+  </div>
+  <div id="click-test" class="test">
+    <button id="testBtn">点击测试按钮</button>
+    <span id="clickResult">未点击</span>
+  </div>
+
+  <script>
+    // 立即执行
+    document.getElementById('status').textContent = '✅ JavaScript 已成功执行！时间: ' + new Date().toLocaleTimeString();
+    document.getElementById('status').style.background = '#1b5e20';
+    
+    // Canvas 测试
+    var canvas = document.getElementById('testCanvas');
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#4fc3f7';
+    ctx.font = '24px sans-serif';
+    ctx.fillText('Canvas 绘制成功!', 60, 100);
+    ctx.fillStyle = '#ff5722';
+    ctx.fillRect(50, 120, 300, 30);
+    
+    // 按钮测试
+    document.getElementById('testBtn').addEventListener('click', function() {
+      document.getElementById('clickResult').textContent = '✅ 按钮点击事件正常!';
+    });
+    
+    // 加载 game.js
+    var script = document.createElement('script');
+    script.src = 'game.js';
+    script.onload = function() {
+      console.log('game.js 加载成功');
+      document.getElementById('status').textContent += ' | game.js 已加载';
+    };
+    script.onerror = function() {
+      document.getElementById('status').textContent = '❌ game.js 加载失败!';
+      document.getElementById('status').style.background = '#b71c1c';
+    };
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>

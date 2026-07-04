@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>调试 - 八大行星</title>
+  <style>
+    body { background: #000; color: #0f0; font-family: monospace; padding: 20px; }
+    .error { color: #f44; }
+    .ok { color: #0f0; }
+    pre { background: #111; padding: 10px; max-height: 300px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <h1>Game.js 调试</h1>
+  <div id="log"></div>
+
+  <script>
+    var logEl = document.getElementById('log');
+    function addLog(msg, cls) {
+      var p = document.createElement('p');
+      p.className = cls || '';
+      p.textContent = msg;
+      logEl.appendChild(p);
+    }
+    
+    addLog('开始加载 game.js...', 'ok');
+    
+    window.onerror = function(msg, url, line, col, err) {
+      addLog('全局错误: ' + msg + ' (行 ' + line + ', 列 ' + col + ')', 'error');
+      if (err && err.stack) {
+        var pre = document.createElement('pre');
+        pre.textContent = err.stack;
+        logEl.appendChild(pre);
+      }
+      return false;
+    };
+    
+    var script = document.createElement('script');
+    script.src = 'game.js';
+    script.onload = function() {
+      addLog('game.js 加载完成', 'ok');
+      addLog('state 对象: ' + (typeof state !== 'undefined' ? '存在' : '不存在'), typeof state !== 'undefined' ? 'ok' : 'error');
+      addLog('planets 数组: ' + (typeof planets !== 'undefined' ? '存在，长度=' + planets.length : '不存在'), typeof planets !== 'undefined' ? 'ok' : 'error');
+      addLog('gameLoop 函数: ' + (typeof gameLoop !== 'undefined' ? '存在' : '不存在'), typeof gameLoop !== 'undefined' ? 'ok' : 'error');
+    };
+    script.onerror = function() {
+      addLog('game.js 加载失败!', 'error');
+    };
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>

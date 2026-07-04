@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>八大行星闯关战</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* 强制显示所有元素 */
+    * { visibility: visible !important; opacity: 1 !important; }
+    .stage-clear-overlay { display: none !important; }
+  </style>
+</head>
+<body>
+  <main class="game-shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Solar Boss Rush</p>
+        <h1>八大行星闯关战</h1>
+        <p>从水星一路挑战到海王星。击败每一关独有怪物赚取星币，升级武器，打倒 8 位行星 Boss。</p>
+      </div>
+      <button id="restartBtn" class="ghost-btn">重新开始</button>
+    </section>
+
+    <section class="hud-grid">
+      <article class="panel player-panel">
+        <div class="panel-title">
+          <span>探索者</span>
+          <strong id="playerLevel">武器 Lv.1</strong>
+        </div>
+        <div id="playerAvatar" class="avatar">🚀</div>
+        <div class="stat-line"><span>生命</span><b id="playerHpText">100 / 100</b></div>
+        <div class="bar"><i id="playerHpBar"></i></div>
+        <div class="mini-stats">
+          <span>攻击 <b id="playerAtk">12</b></span>
+          <span>星币 <b id="coins">0</b></span>
+          <span>治疗包 <b id="medkits">2</b></span>
+        </div>
+      </article>
+
+      <article class="panel stage-panel">
+        <div class="panel-title">
+          <span id="planetName">水星</span>
+          <strong id="stageText">第 1 / 8 关</strong>
+        </div>
+        <div id="planetIcon" class="planet-icon">☿</div>
+        <p id="planetDesc" class="planet-desc"></p>
+        <div class="progress-dots" id="progressDots"></div>
+      </article>
+
+      <article class="panel shop-panel">
+        <div class="panel-title">
+          <span>武器工坊</span>
+          <strong id="upgradeCost">50 星币</strong>
+        </div>
+        <p>升级后提升普通攻击和蓄能炮伤害，是挑战后期 Boss 的关键。</p>
+        <button id="upgradeBtn" class="primary-btn">升级武器</button>
+        <button id="healBtn" class="secondary-btn">购买治疗包（35）</button>
+      </article>
+    </section>
+
+    <section class="panel medals-panel">
+      <div class="panel-title">
+        <span>勋章收藏</span>
+        <strong id="medalCount">0 / 8</strong>
+      </div>
+      <p>打赢每个行星 Boss 后，会获得一枚独特勋章。</p>
+      <div id="medalsGrid" class="medals-grid"></div>
+    </section>
+
+    <section class="panel leaderboard-panel">
+      <div class="panel-title">
+        <span>🏆 排行榜</span>
+        <strong id="leaderboardCount">0 条记录</strong>
+      </div>
+      <p>每局结束后战绩自动记录，切换标签查看不同排名。</p>
+      <div class="leaderboard-tabs">
+        <button class="leaderboard-tab active" data-tab="kills">⚔️ 击杀数</button>
+        <button class="leaderboard-tab" data-tab="score">💰 总积分</button>
+        <button class="leaderboard-tab" data-tab="speed">⏱️ 通关速度</button>
+      </div>
+      <div id="leaderboardList" class="leaderboard-list">
+        <div class="leaderboard-empty">还没有通关记录，快去挑战吧！</div>
+      </div>
+      <button id="clearLeaderboardBtn" class="secondary-btn" style="margin-top:12px">清空排行榜</button>
+    </section>
+
+    <section class="battle-area two-d-layout">
+      <article class="arena-card">
+        <div class="enemy-topline">
+          <span id="enemyType">2D 横版战斗</span>
+          <strong id="enemyReward">奖励 0</strong>
+        </div>
+        <canvas id="gameCanvas" width="900" height="460" tabindex="0" aria-label="八大行星 2D 闯关战场"></canvas>
+        <div class="keyboard-tip">先点"开始本关"或直接点击战场，怪物出现后再操作：A / D 或 ← / → 移动，空格 / J 普通射击，K 蓄能炮。</div>
+      </article>
+
+      <article class="control-card">
+        <div class="enemy-status">
+          <div id="enemyAvatar" class="enemy-avatar">👾</div>
+          <div>
+            <h2 id="enemyName">准备战斗</h2>
+            <div class="stat-line"><span>敌人生命</span><b id="enemyHpText">0 / 0</b></div>
+            <div class="bar enemy"><i id="enemyHpBar"></i></div>
+          </div>
+        </div>
+        <div id="message" class="message">点击"开始本关"，进入水星第一波。</div>
+        <div class="actions">
+          <button id="startBtn" class="primary-btn">开始本关</button>
+          <button id="attackBtn" class="primary-btn" disabled>普通射击</button>
+          <button id="jumpBtn" class="secondary-btn" disabled>跳跃躲避</button>
+          <button id="skillBtn" class="secondary-btn" disabled>蓄能炮</button>
+          <button id="medkitBtn" class="secondary-btn" disabled>使用治疗包</button>
+        </div>
+        <ol id="battleLog" class="battle-log"></ol>
+      </article>
+    </section>
+  </main>
+
+  <section id="stageClearOverlay" class="stage-clear-overlay" aria-hidden="true">
+    <div id="stageClearConfetti" class="stage-clear-confetti"></div>
+    <div class="stage-clear-card">
+      <div id="stageClearIcon" class="stage-clear-icon">🚀</div>
+      <p class="stage-clear-kicker">STAGE CLEAR</p>
+      <h2 id="stageClearTitle">恭喜通过关卡！</h2>
+      <p id="stageClearUpgrade">你的飞船已经升级成新的形态。</p>
+      <p id="stageClearMedal" class="stage-clear-medal">获得独特勋章</p>
+      <p class="stage-clear-tip">动画结束后即可进入下一关</p>
+    </div>
+  </section>
+
+  <script src="game.js"></script>
+</body>
+</html>
